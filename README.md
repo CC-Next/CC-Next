@@ -8,6 +8,8 @@ badges ![status](https://github.com/CC-Next/CC_Next/actions/workflows/<WORKFLOW_
 Each branch needs to
 	Pull (rebase?) from upstream
 	Pull (rebase?) from its PR (if it has one)
+    Fetch custom Cobalt jar (if required)
+        lua 5.2 - https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar
 	Build
 	Test?
 	Upload build artifact (and test log?)

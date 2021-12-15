@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - 'CCN/*'
+    - '!CNN/main' # not the orphan branch
+    - 'MC-*'
+  schedule:
+    - cron:  '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      

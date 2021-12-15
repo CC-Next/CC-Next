@@ -1,6 +1,10 @@
 # CC:Next
 
 <!-- TODO: workflows
+
+badges ![status](https://github.com/CC-Next/CC_Next/actions/workflows/<WORKFLOW_FILE>/badge.svg)
+
+
 Each branch needs to
 	Pull (rebase?) from upstream
 	Pull (rebase?) from its PR (if it has one)
@@ -8,6 +12,8 @@ Each branch needs to
 	Test?
 	Upload build artifact (and test log?)
 -->
+
+
 
 ## About
 

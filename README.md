@@ -13,6 +13,16 @@ Each branch needs to
 	Build
 	Test?
 	Upload build artifact (and test log?)
+    Link the build artifact in the readme?
+        https://nightly.link/ already installed on repo
+
+
+* auto delete old builds?
+
+* find a way to trigger builds that isn't just nightly
+
+* automatically make new branches when CC:T has a new PR
+
 -->
 
 
@@ -48,16 +58,3 @@ So a complete example will look like this `cc-tweaked-1.16.5-1.99.0+c4024a4+2044
 Our branches have a similar naming system as our versioning and is simply `CCN/<MC version>+<extras>`, so the above example version would be tracked on the `CCN/1.16.5+Cobalt.PR50` branch. With Cobalt branches being `CCN/<extras>` where extras just refers to Cobalt PRs, sometimes with a note on what that PR implements. *All branches should start with `CCN/`* this helps us spot them amongst the branches that we inherit from upstream, the exception to this are the basic MC version branches that track the upstream. Another exception is `CCN/main` which exists just for the README, workflows and other bits for GitHub.
 
 All CC:N branches will do nightly builds (once it's set up, for now all is manual<!-- TODO: don't forget to edit this -->), pulling the latest from their PRs and from their upstream branch on the CC:T repo.
-
-<!-- 
-TODO:
-* set up automatic nightly builds of CC:T
-  * GH actions and action artifacts
-    * https://nightly.link/ already installed on repo
-
-* auto delete old builds?
-
-* what if the PR updates without CC:T itself getting a new commit, we would have to detect that and would want a way to identify the new build
-
-* set up automatic merges of PRs made against CC:T
- -->

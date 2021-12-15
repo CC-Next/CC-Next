@@ -2,7 +2,7 @@
 
 ## About
 
-Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/cc-tweaked/CC-Tweaked) with some extra features from pull requests thrown in. We expect to have bugs and issues and thats the point, we also are not holding to ourselves to the same version migration requirements that CC:T has.
+Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/cc-tweaked/CC-Tweaked) with some extra features from pull requests thrown in. We expect to have bugs and issues and that's the point, we also are not holding to ourselves to the same version migration requirements that CC:T has.
 
 ## Quality
 

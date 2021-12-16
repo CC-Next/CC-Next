@@ -52,6 +52,7 @@ Since we expect to have multiple diverging concurrent releases we need a bit of 
 
 So a complete example will look like this `cc-tweaked-1.16.5-1.99.0+c4024a4+2044ac4+(Cobalt.PR50)`. <!-- TODO: replace the second commit with a real one -->
 <!-- TODO: build server will need to be able to fill in these, the CC:N commit will be difficult -->
+<!-- TODO: from @Merith-TK : `cc-tweaked_<version>_<commit>-mc<version>-ccn_<commit>-<extras>` -->
 
 ## Branch Naming System
 

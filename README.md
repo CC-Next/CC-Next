@@ -23,6 +23,8 @@ Each branch needs to
 
 * automatically make new branches when CC:T has a new PR
 
+* auto build docs and host them somewhere
+
 -->
 
 

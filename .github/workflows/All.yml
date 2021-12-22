@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: update mc-1.17.x
-      uses: ./.github/actions/tracking
+      uses: .github/actions/tracking
       with:
         branch: mc-1.17.x
 

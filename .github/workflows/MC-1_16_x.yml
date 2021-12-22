@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
     - name: add upstream
-      if: ${{ env.ACT }}
+      if: ${{ !env.ACT }}
       run: git remote add upstream https://github.com/cc-tweaked/CC-Tweaked.git
 
     - name: pull upstream

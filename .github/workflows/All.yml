@@ -11,7 +11,9 @@ on:
     - cron:  '0 0 * * *'
 
 jobs:
-  build:
+  build-all:
     runs-on: ubuntu-latest
     steps:
-      
+    - run: pwd
+
+

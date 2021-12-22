@@ -73,5 +73,6 @@ jobs:
         remote: origin
         ref: "refs/heads/mc-1.16.x"
         remote-ref: "refs/remotes/origin/mc-1.16.x"
+    - run: git push origin :refs/heads/mc-1.16.x
 
 

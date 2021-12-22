@@ -5,6 +5,9 @@ inputs:
   branch:  # id of input
     description: 'Which branch to update and build'
     required: true
+  github-token:
+    description: 'github token to push with'
+    required: true
 
 runs:
   using: "composite"
@@ -68,5 +71,5 @@ runs:
     uses: dciborow/commit@0.0.1
     if: ${{ env.ACT || success() }}
     with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ inputs.GITHUB_TOKEN }}
       push-branch: ${{ inputs.branch }}

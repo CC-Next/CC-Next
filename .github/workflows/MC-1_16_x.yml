@@ -14,8 +14,6 @@ on:
 jobs:
   build-mc-1_16_x:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
     - name: checkout
       uses: actions/checkout@v2
@@ -73,7 +71,7 @@ jobs:
       with:
         create-commit: true
         remote: origin
-        #ref: mc-1.16.x
-        remote-ref: mc-1.16.x
+        ref: "mc-1.16.x"
+        remote-ref: "mc-1.16.x"
 
 

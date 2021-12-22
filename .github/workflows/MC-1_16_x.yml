@@ -24,6 +24,7 @@ jobs:
     - name: pull upstream
       run: |
         git checkout mc-1.16.x
+        git remote add upstream https://github.com/cc-tweaked/CC-Tweaked.git
         git pull upstream mc-1.16.x
 
     - name: install xvfb

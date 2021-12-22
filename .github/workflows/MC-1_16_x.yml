@@ -68,5 +68,10 @@ jobs:
     - name: push changes
       uses: actions-go/push@v1
       if: ${{ env.ACT || success() }}
+      with:
+        create-commit: true
+        remote: origin
+        ref: mc-1.16.x
+
 
 

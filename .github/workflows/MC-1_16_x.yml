@@ -65,7 +65,7 @@ jobs:
         name: CC-Next
         path: build/libs
 
-    - name: push changes
+    - name: push changes # I need the commit id in the version number, which means that I'm going to want to have the push changes before I build
       uses: dciborow/commit@0.0.1
       if: ${{ env.ACT || success() }}
       with:

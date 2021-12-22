@@ -14,6 +14,9 @@ jobs:
   build-all:
     runs-on: ubuntu-latest
     steps:
-    - run: pwd
+    - name: update mc-1.17.x
+      uses: ./.github/actions/tracking
+      with:
+        branch: mc-1.17.x
 
 

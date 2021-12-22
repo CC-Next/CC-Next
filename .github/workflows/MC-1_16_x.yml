@@ -67,7 +67,7 @@ jobs:
 
     - name: push changes
       permissions:
-        issues: contents
+        contents: write
       uses: actions-go/push@v1
       if: ${{ env.ACT || success() }}
       with:

@@ -66,6 +66,7 @@ jobs:
         path: build/libs
 
     - name: push changes # I need the commit id in the version number, which means that I'm going to want to have the push changes before I build
+                         # two jobs? one to merge and the other to build?
       uses: dciborow/commit@0.0.1
       if: ${{ env.ACT || success() }}
       with:

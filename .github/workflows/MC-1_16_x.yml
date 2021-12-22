@@ -1,4 +1,4 @@
-name: CI
+name: MC-1_16_x
 
 on:
   workflow_call:

@@ -54,19 +54,15 @@ jobs:
         ./gradlew downloadAssets || ./gradlew downloadAssets
         xvfb-run ./gradlew build
 
-    - name: ls build/libs
-      run: ls build/libs
+    - name: Upload Jar
+      uses: actions/upload-artifact@v2
       if: always()
+      with:
+        name: CC-Next
+        path: build/libs
 
-    # - name: Upload Jar
-    #   uses: actions/upload-artifact@v2
-    #   if: always()
-    #   with:
-    #     name: CC-Next
-    #     path: build/libs
-
-    # - name: push changes
-    #   uses: actions-go/push@v1
-    #   if: always()
+    - name: push changes
+      uses: actions-go/push@v1
+      if: always()
 
 

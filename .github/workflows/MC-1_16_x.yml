@@ -60,13 +60,13 @@ jobs:
 
     - name: Upload Jar
       uses: actions/upload-artifact@v2
-      if: ${{ env.ACT }} # gradle test seems to sometimes time out or something
+      if: ${{ env.ACT || success() }} # gradle test seems to sometimes time out or something, checking if we are acting allows us to pretend that all the tests passed
       with:
         name: CC-Next
         path: build/libs
 
     - name: push changes
       uses: actions-go/push@v1
-      if: ${{ env.ACT }}
+      if: ${{ env.ACT || success() }}
 
 

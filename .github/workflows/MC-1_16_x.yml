@@ -5,9 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - 'CCN/*'
-    - '!CNN/main' # not the orphan branch
-    - 'MC-*'
+    - 'MC-1.16.x'
   schedule:
     - cron:  '0 0 * * *'
 
@@ -15,6 +13,9 @@ jobs:
   build-mc-1_16_x:
     runs-on: ubuntu-latest
     steps:
+    - name: export branch env var
+      run: echo "BRANCH=mc-1.16.x" >> $GITHUB_ENV # TODO: edit this when copy and pasting
+
     - name: checkout
       uses: actions/checkout@v2
       with:
@@ -27,8 +28,8 @@ jobs:
 
     - name: pull upstream
       run: |
-        git checkout mc-1.16.x
-        git pull upstream mc-1.16.x
+        git checkout ${{ env.BRANCH }}
+        git pull upstream ${{ env.BRANCH }}
 
     - name: install xvfb
       if: ${{ env.ACT }} # https://github.com/nektos/act#skipping-steps
@@ -65,10 +66,9 @@ jobs:
         name: CC-Next
         path: build/libs
 
-    - name: push changes # I need the commit id in the version number, which means that I'm going to want to have the push changes before I build
-                         # two jobs? one to merge and the other to build?
+    - name: push changes
       uses: dciborow/commit@0.0.1
       if: ${{ env.ACT || success() }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        push-branch: 'mc-1.16.x'
+        push-branch: '${{ env.BRANCH }}'

@@ -1,20 +1,20 @@
-name: MC-1_18_x
+name: MC-1_17_x
 
 on:
   workflow_call:
   workflow_dispatch:
   push:
     branches:
-    - 'MC-1.18.x'
+    - 'MC-1.17.x'
   schedule:
     - cron:  '0 0 * * *'
 
 jobs:
-  build-mc-1_18_x:
+  build-mc-1_17_x:
     runs-on: ubuntu-latest
     steps:
     - name: export branch env var
-      run: echo "BRANCH=mc-1.18.x" >> $GITHUB_ENV # TODO: edit this when copy and pasting
+      run: echo "BRANCH=mc-1.17.x" >> $GITHUB_ENV # TODO: edit this when copy and pasting
 
     - name: checkout
       uses: actions/checkout@v2

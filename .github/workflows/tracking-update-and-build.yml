@@ -28,7 +28,7 @@ jobs:
     needs: [update-mc-1_16_x, update-mc-1_17_x]
     with:
       branch: mc-1.17.x
-      merge-from-branch: mc-1.16.x
+      merge-from-branch: origin/mc-1.16.x
   build-mc-1_17_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-tracking-builder.yml@CCN/main
     needs: merge-mc-1_17_x-with-mc-1_16_x
@@ -44,7 +44,7 @@ jobs:
     needs: [update-mc-1_18_x, merge-mc-1_17_x-with-mc-1_16_x]
     with:
       branch: mc-1.18.x
-      merge-from-branch: mc-1.17.x
+      merge-from-branch: origin/mc-1.17.x
   build-mc-1_18_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-tracking-builder.yml@CCN/main
     needs: merge-mc-1_18_x-with-mc-1_17_x

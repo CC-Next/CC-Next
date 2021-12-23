@@ -9,7 +9,10 @@ on:
   #   - cron:  '0 0 * * *'
 
 jobs:
-  build-all:
-    uses: CC-Next/CC-Next/.github/workflows/MC-1_16_x.yml@CCN/main
+  build-mc-1_16_x:
+    uses: CC-Next/CC-Next/.github/workflows/generic-tracking-updater.yml@CCN/main
     with:
       branch: mc-1.16.x
+
+  # 1.17 needs to also pull from 1.16
+  # 1.18 needs to also pull from 1.17 (after 1.17 has pulled from 1.16)

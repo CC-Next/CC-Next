@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
+      with:
+       fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
     - name: checkout the real branch
       run: git checkout ${{ inputs.branch }}

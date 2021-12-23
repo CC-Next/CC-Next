@@ -45,23 +45,11 @@ jobs:
     #- name: Add commit ids to the version number
       # ./gradle.properties
 
-
     - name: Build with Gradle
       run: |
         ./gradlew assemble || ./gradlew assemble
         ./gradlew downloadAssets || ./gradlew downloadAssets
         xvfb-run ./gradlew build
-
-    # TODO: might not need this
-    # - name: Rename CC:T to CC:N on build files
-    #   run: |
-    #     pushd .
-    #     cd build/libs
-    #     for f in *.jar; do
-    #       mv -n "$f" "${f/-0}";
-    #     done
-    #     popd
-
 
     - name: Upload Jar
       uses: actions/upload-artifact@v2

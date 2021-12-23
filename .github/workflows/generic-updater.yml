@@ -6,6 +6,10 @@ on:
       branch:
         required: true
         type: string
+    outputs:
+      upstreamCommit:
+        description: "The commit ID that upstream is at."
+        value: ${{ jobs.update-branch.outputs.upstreamCommit }}
 
 jobs:
   update-branch:
@@ -25,6 +29,8 @@ jobs:
       run: |
         git checkout ${{ inputs.branch }}
         git pull upstream ${{ inputs.branch }}
+
+    # TODO: get the commit id from upstream and output it
 
     - name: push changes
       uses: dciborow/commit@0.0.1

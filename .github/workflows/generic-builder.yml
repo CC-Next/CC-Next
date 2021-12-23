@@ -6,6 +6,9 @@ on:
       branch:
         required: true
         type: string
+      upstreamCommit:
+        required: true
+        type: string
 
 jobs:
   build-branch:
@@ -44,6 +47,7 @@ jobs:
     # TODO: automatic version number
     #- name: Add commit ids to the version number
       # ./gradle.properties
+      # value can be got from inputs.upstreamCommit
 
     - name: Build with Gradle
       run: |

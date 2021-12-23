@@ -11,5 +11,4 @@ on:
 
 jobs:
   build-all:
-    - name: build-1.16.x
-      uses: CC-Next/CC-Next/.github/workflows/MC-1_16_x.yml@CCN/main
+    - uses: CC-Next/CC-Next/.github/workflows/MC-1_16_x.yml@CCN/main

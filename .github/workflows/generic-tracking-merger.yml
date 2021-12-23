@@ -19,26 +19,19 @@ jobs:
       with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token TODO: does this need to be false?
           fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
-          
+
     - name: put gh token into env
       run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
 
-    - name: merge
+    - name: merge and force push
       uses: bambamboole/gha-upmerge@v1.0.1
       with:
         from_branch: ${{ inputs.from-branch }}
         to_branch: ${{ inputs.to-branch }}
-        
+
     - name: remove gh token from env
       run: echo "GITHUB_TOKEN=purged" >> $GITHUB_ENV
 
-
-    - name: push changes
-      uses: dciborow/commit@0.0.1
-      if: ${{ env.ACT || success() }}
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        push-branch: '${{ inputs.branch }}'
 
 

@@ -1,4 +1,4 @@
-name: tracking-updater
+name: tracking-update-and-build
 
 on:
   workflow_dispatch:
@@ -9,8 +9,13 @@ on:
   #   - cron:  '0 0 * * *'
 
 jobs:
-  build-mc-1_16_x:
+  update-mc-1_16_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-tracking-updater.yml@CCN/main
+    with:
+      branch: mc-1.16.x
+  build-mc-1_16_x:
+    uses: CC-Next/CC-Next/.github/workflows/generic-tracking-builder.yml@CCN/main
+    needs: update-mc-1_16_x
     with:
       branch: mc-1.16.x
 

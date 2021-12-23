@@ -11,3 +11,5 @@ on:
 jobs:
   build-all:
     uses: CC-Next/CC-Next/.github/workflows/MC-1_16_x.yml@CCN/main
+    with:
+      branch: mc-1.16.x

@@ -2,20 +2,15 @@ name: MC-1_16_x
 
 on:
   workflow_call:
-  workflow_dispatch:
-  # push:
-  #   branches:
-  #   - 'MC-1.16.x'
-  # schedule:
-  #   - cron:  '0 0 * * *'
+    inputs:
+      branch:
+        required: true
+        type: string
 
 jobs:
   build-mc-1_16_x:
     runs-on: ubuntu-latest
     steps:
-    - name: export branch env var
-      run: echo "BRANCH=mc-1.16.x" >> $GITHUB_ENV # TODO: edit this when copy and pasting
-
     - name: checkout
       uses: actions/checkout@v2
       with:
@@ -28,8 +23,8 @@ jobs:
 
     - name: pull upstream
       run: |
-        git checkout ${{ env.BRANCH }}
-        git pull upstream ${{ env.BRANCH }}
+        git checkout ${{ inputs.branch }}
+        git pull upstream ${{ inputs.branch }}
 
     - name: install xvfb
       if: ${{ env.ACT }} # https://github.com/nektos/act#skipping-steps
@@ -71,4 +66,4 @@ jobs:
       if: ${{ env.ACT || success() }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        push-branch: '${{ env.BRANCH }}'
+        push-branch: '${{ inputs.branch }}'

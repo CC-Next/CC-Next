@@ -23,7 +23,26 @@ Each branch needs to
 
 * automatically make new branches when CC:T has a new PR
 
-* auto build docs and host them somewhere
+* auto build docs and host them somewhere (need to edit these files, look for "tweaked")
+    * ./illuaminate.sexp
+    * ./package-lock.json
+    * ./package.json
+    * ./doc/index.md
+    * ./
+
+* upload to curseforge and stuff? copycat support? (will need to edit, look for "tweaked")
+    * ./build.gradle
+    * ./rollup.config.js
+
+TODO: the following files reference CC:T and I'm reluctant to change them
+    * ./src/main/resources/data/computercraft/lua/rom/motd.txt
+    * ./src/main/java/dan200/computercraft/core/apis/http/request/HttpResponseHandle.java
+    * ./src/main/java/dan200/computercraft/api/lua/GenericSource.java
+    * ./doc/stub/os.lua
+    * ./src/main/resources/data/computercraft/lua/rom/programs/http/wget.lua
+    * ./src/main/resources/data/computercraft/lua/rom/programs/http/pastebin.lua
+    * ./src/main/resources/data/computercraft/lua/rom/help/whatsnew.md
+    * ./
 
 -->
 

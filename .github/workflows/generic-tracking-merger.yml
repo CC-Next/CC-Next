@@ -17,7 +17,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
       with:
-          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token TODO: does this need to be false?
+          persist-credentials: true # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token TODO: does this need to be false?
           fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
     - name: merge

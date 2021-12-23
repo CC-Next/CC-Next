@@ -11,12 +11,5 @@ on:
 
 jobs:
   build-all:
-    runs-on: ubuntu-latest
-    steps:
-    - name: checkout
-      uses: actions/checkout@v2
-      with:
-        persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
-        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
     - name: build-1.16.x
       uses: CC-Next/CC-Next/.github/workflows/MC-1_16_x.yml@CCN/main

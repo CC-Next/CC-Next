@@ -1,4 +1,4 @@
-name: generic-tracking-builder
+name: generic-builder
 
 on:
   workflow_call:
@@ -50,7 +50,7 @@ jobs:
         ./gradlew assemble || ./gradlew assemble
         ./gradlew downloadAssets || ./gradlew downloadAssets
         xvfb-run ./gradlew build
-        
+
     # sometimes tests don't reach done and thus fail, TODO: figure out what to do when this happens
 
     - name: Upload Jar

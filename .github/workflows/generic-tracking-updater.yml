@@ -1,4 +1,4 @@
-name: generic-tracking-updater
+name: generic-updater
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: generic-tracking-merger
+name: generic-merger
 
 on:
   workflow_call:

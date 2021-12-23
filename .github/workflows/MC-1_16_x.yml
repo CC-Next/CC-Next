@@ -3,11 +3,11 @@ name: MC-1_16_x
 on:
   workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-    - 'MC-1.16.x'
-  schedule:
-    - cron:  '0 0 * * *'
+  # push:
+  #   branches:
+  #   - 'MC-1.16.x'
+  # schedule:
+  #   - cron:  '0 0 * * *'
 
 jobs:
   build-mc-1_16_x:

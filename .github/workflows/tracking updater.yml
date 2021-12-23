@@ -1,0 +1,17 @@
+name: MC-1_16_x
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #   - 'MC-'
+  # schedule:
+  #   - cron:  '0 0 * * *'
+
+jobs:
+  build-all:
+    runs-on: ubuntu-latest
+    steps:
+    - name: build-1.16.x
+      uses: CC-Next/CC-Next/blob/CCN/main/.github/workflows/MC-1_16_x.yml

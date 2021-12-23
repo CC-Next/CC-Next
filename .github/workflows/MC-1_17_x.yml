@@ -1,13 +1,14 @@
 name: MC-1_17_x
+# 1.17 merges from 1.16
 
 on:
   workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-    - 'MC-1.17.x'
-  schedule:
-    - cron:  '0 0 * * *'
+  # push:
+  #   branches:
+  #   - 'MC-1.17.x'
+  # schedule:
+  #   - cron:  '0 0 * * *'
 
 jobs:
   build-mc-1_17_x:

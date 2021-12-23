@@ -1,13 +1,16 @@
 name: MC-1_18_x
-
+# 1.18 merges from 1.17
+# 1.17 merges from 1.16
+# this might be an issue
+# could we just merge from 1.17 and then 1.18?
 on:
   workflow_call:
   workflow_dispatch:
-  push:
-    branches:
-    - 'MC-1.18.x'
-  schedule:
-    - cron:  '0 0 * * *'
+  # push:
+  #   branches:
+  #   - 'MC-1.18.x'
+  # schedule:
+  #   - cron:  '0 0 * * *'
 
 jobs:
   build-mc-1_18_x:

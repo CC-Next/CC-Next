@@ -1,4 +1,4 @@
-   name: generic-tracking-updater
+name: generic-tracking-updater
 
 on:
   workflow_call:
@@ -9,7 +9,7 @@ on:
       merge-from-branch:
         requried: true
         type: string
-# TODO: commit and then build so that we have a commit id to put in the release version number
+
 jobs:
   update-branch:
     runs-on: ubuntu-latest

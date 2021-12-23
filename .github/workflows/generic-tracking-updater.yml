@@ -6,9 +6,7 @@ on:
       branch:
         required: true
         type: string
-      merge-from-branch:
-        requried: false
-        type: string
+
 jobs:
   update-branch:
     runs-on: ubuntu-latest

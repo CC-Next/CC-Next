@@ -25,7 +25,7 @@ jobs:
       branch: mc-1.17.x
   merge-mc-1_17_x-with-mc-1_16_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-tracking-merger.yml@CCN/main
-    needs: [update-mc-1_16_x, update-mc-1.17.x]
+    needs: [update-mc-1_16_x, update-mc-1_17_x]
     with:
       branch: mc-1.17.x
       merge-from-branch: mc-1.16.x

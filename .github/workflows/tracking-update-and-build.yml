@@ -3,10 +3,10 @@ name: tracking-update-and-build
 on:
   workflow_dispatch:
   push:
-    # branches:
-    # - 'MC-'
-  # schedule:
-  #   - cron:  '0 0 * * *'
+     # branches:
+     # - 'MC-*'
+   # schedule:
+   #   - cron:  '0 0 * * *'
 
 jobs:
   update-mc-1_16_x:

@@ -25,6 +25,7 @@ jobs:
       with:
         from_branch: ${{ inputs.from-branch }}
         to_branch: ${{ inputs.to-branch }}
+        push_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: push changes
       uses: dciborow/commit@0.0.1

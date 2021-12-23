@@ -29,7 +29,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 version = mod_version
 
 group = "org.squiddev"
-archivesBaseName = "cc-tweaked-${mc_version}"
+archivesBaseName = "cc-next-${mc_version}"
 
 def javaVersion = JavaLanguageVersion.of(8)
 java {
@@ -194,7 +194,7 @@ jar {
             "Specification-Title"     : "computercraft",
             "Specification-Vendor"    : "SquidDev",
             "Specification-Version"   : "1",
-            "Implementation-Title"    : "CC: Tweaked",
+            "Implementation-Title"    : "CC: Next",
             "Implementation-Version"  : "${mod_version}",
             "Implementation-Vendor"   : "SquidDev",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),

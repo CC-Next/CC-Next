@@ -1,4 +1,4 @@
-name: MC-1_16_x
+name: tracking-updater
 
 on:
   workflow_call:

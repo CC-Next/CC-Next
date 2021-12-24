@@ -2,9 +2,6 @@
 
 <!-- TODO: workflows
 
-badges ![status](https://github.com/CC-Next/CC_Next/actions/workflows/<WORKFLOW_FILE>/badge.svg)
-
-
 Each branch needs to
 	Pull (rebase?) from upstream
 	Pull (rebase?) from its PR (if it has one)
@@ -28,7 +25,6 @@ Might not be a bad idea to add the commit ids to the artifact names, the builds 
     * ./package-lock.json
     * ./package.json
     * ./doc/index.md
-    * ./
 
 * upload to curseforge and stuff? copycat support? (will need to edit, look for "tweaked")
     * ./build.gradle
@@ -42,7 +38,6 @@ TODO: the following files reference CC:T and I'm reluctant to change them
     * ./src/main/resources/data/computercraft/lua/rom/programs/http/wget.lua
     * ./src/main/resources/data/computercraft/lua/rom/programs/http/pastebin.lua
     * ./src/main/resources/data/computercraft/lua/rom/help/whatsnew.md
-    * ./
 
 -->
 

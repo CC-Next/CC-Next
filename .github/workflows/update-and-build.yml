@@ -5,8 +5,8 @@ on:
   push:
      # branches:
      # - 'MC-*'
-   # schedule:
-   #   - cron:  '0 0 * * *'
+  schedule:
+    - cron:  '0 0 * * *'
 
 jobs:
   update-mc-1_16_x:

@@ -50,7 +50,7 @@ Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/
 ## Link To Builds
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/CC-Next/CC-Next/mc-1.18.x?label=updated)  ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/CC-Next/CC-Next/update-and-build)  [![download](https://img.shields.io/badge/download-latest%20jars-brightgreen)](https://nightly.link/CC-Next/CC-Next/workflows/update-and-build/CCN%2Fmain)
 
-If your download's commit ID doesn't match the repo's then wait a while and download again, the builds can take a little while (> 7 mins for some).
+If your download's commit ID doesn't match the branch it's built from then wait a while and download again, the builds can take a little while (> 7 mins for some).
 
 ## Quality
 

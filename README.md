@@ -11,7 +11,7 @@ Each branch needs to
 	Test?
 	Upload build artifact (and test log?)
 
-Might not be a bad idea to add the commit ids to the artifact names, the builds to take a while and if people are too quick they might grab a build while things are in progress.
+Might not be a bad idea to add the commit ids to the artifact names, the builds to take a while and if people are too quick they might grab a build while things are in progress. Date of build could work too.
     Might want to just upload the mod jar too (skipping the other bits)
 
 * auto delete old builds?

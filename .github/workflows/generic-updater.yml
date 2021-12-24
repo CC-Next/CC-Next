@@ -21,6 +21,8 @@ on:
 
 jobs:
   update-branch:
+    outputs:
+      upstreamCommit: ${{ steps.output-upstream-commit-id.outputs.upstreamCommit }}
     runs-on: ubuntu-latest
     steps:
     - name: checkout
@@ -46,7 +48,10 @@ jobs:
         git checkout ${{ inputs.branch }}
         git pull upstream ${{ env.upstream-branch }}
 
-    # TODO: get the commit id from upstream and output it
+    - name: output upstream commit id
+      id: output-upstream-commit-id
+      run: echo "::set-output name=upstreamCommit::`git rev-parse upstream/${{ env.upstream-branch }}`"
+
 
     - name: push changes
       uses: dciborow/commit@0.0.1

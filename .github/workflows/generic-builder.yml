@@ -45,7 +45,10 @@ jobs:
         echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
     # TODO: automatic version number
-    #- name: Add commit ids to the version number
+    - name: Add commit ids to the version number
+      run: |
+        echo upstream commit ${{ inputs.upstreamCommit}}
+        echo our commit `git rev-parse HEAD`
       # ./gradle.properties
       # value can be got from inputs.upstreamCommit
 

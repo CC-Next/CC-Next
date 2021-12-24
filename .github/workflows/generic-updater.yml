@@ -44,7 +44,7 @@ jobs:
     - name: pull upstream
       run: |
         git checkout ${{ inputs.branch }}
-        git pull upstream ${{ inputs.upstream-branch }}
+        git pull upstream ${{ env.upstream-branch }}
 
     # TODO: get the commit id from upstream and output it
 

@@ -35,9 +35,9 @@ jobs:
 
     - name: default upstream-branch # because setting the defualt to a var didn't work
       run: |
-        echo "upstream-branch=${{ inputs.upstream-branch }}" >> $GITHUB_ENV
-        if ${{ inputs.upstream-branch }} == "" then
-          echo "upstream-branch=${{ inputs.branch }}" >> $GITHUB_ENV
+        echo "upstream-branch=\"${{ inputs.upstream-branch }}\"" >> $GITHUB_ENV
+        if "${{ inputs.upstream-branch }}" == "" then
+          echo "upstream-branch=\"${{ inputs.branch }}\"" >> $GITHUB_ENV
         done
         return 0
 

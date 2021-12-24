@@ -6,6 +6,14 @@ on:
       branch:
         required: true
         type: string
+      upstream-repo:
+        required: false
+        type: string
+        default: https://github.com/cc-tweaked/CC-Tweaked.git
+      upstream-branch:
+        required: false
+        type: string
+        default: ${{ inputs.branch }}
     outputs:
       upstreamCommit:
         description: "The commit ID that upstream is at."
@@ -23,7 +31,7 @@ jobs:
 
     - name: add upstream
       if: ${{ !env.ACT }}
-      run: git remote add upstream https://github.com/cc-tweaked/CC-Tweaked.git
+      run: git remote add upstream ${{ inputs.upstream-repo }}
 
     - name: pull upstream
       run: |

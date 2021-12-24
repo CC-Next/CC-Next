@@ -49,7 +49,7 @@ jobs:
       run: |
         upstreamCommit=${{ inputs.upstreamCommit}}
         ourCommit=`git rev-parse HEAD`
-        versionNumber=${upstreamCommit:0:7}+${ourCommit:0:7}
+        versionNumber=+${upstreamCommit:0:7}+${ourCommit:0:7}
         sed -r 's/(mod_version=[0-9\.]+)/\1'$versionNumber'/' gradle.properties > gradle.properties.new
         mv gradle.properties.new gradle.properties
 

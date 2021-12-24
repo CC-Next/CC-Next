@@ -2,6 +2,8 @@
 
 <!-- TODO: workflows
 
+Find a way to make a shield that goes red when the build starts and green when the last one completes.
+
 Each branch needs to
 	Pull (rebase?) from upstream
 	Pull (rebase?) from its PR (if it has one)

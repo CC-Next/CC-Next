@@ -44,13 +44,14 @@ jobs:
         mkdir -p ~/.gradle
         echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
-    # TODO: automatic version number
+    # TODO: add PRs to versionNumber
     - name: Add commit ids to the version number
       run: |
-        echo upstream commit ${{ inputs.upstreamCommit}}
-        echo our commit `git rev-parse HEAD`
-      # ./gradle.properties
-      # value can be got from inputs.upstreamCommit
+        upstreamCommit=${{ inputs.upstreamCommit}}
+        ourCommit=`git rev-parse HEAD`
+        versionNumber=${upstreamCommit:0:7}+${ourCommit:0:7}
+        sed -r 's/(mod_version=[0-9\.]+)/\1'$versionNumber'/' gradle.properties > gradle.properties.new
+        mv gradle.properties.new gradle.properties
 
     - name: Build with Gradle
       run: |

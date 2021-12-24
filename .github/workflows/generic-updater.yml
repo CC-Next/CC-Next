@@ -13,7 +13,7 @@ on:
       upstream-branch:
         required: false
         type: string
-        default: ${{ inputs.branch }}
+        default: ""
     outputs:
       upstreamCommit:
         description: "The commit ID that upstream is at."
@@ -33,10 +33,17 @@ jobs:
       if: ${{ !env.ACT }}
       run: git remote add upstream ${{ inputs.upstream-repo }}
 
+    - name: default upstream-branch # because setting the defualt to a var didn't work
+      run: |
+        echo "upstream-branch=${{ inputs.upstream-branch }}" >> $GITHUB_ENV
+        if ${{ inputs.upstream-branch }} == "" then
+          echo "upstream-branch=${{ inputs.branch }}" >> $GITHUB_ENV
+        done
+
     - name: pull upstream
       run: |
         git checkout ${{ inputs.branch }}
-        git pull upstream ${{ inputs.branch }}
+        git pull upstream ${{ inputs.upstream-branch }}
 
     # TODO: get the commit id from upstream and output it
 

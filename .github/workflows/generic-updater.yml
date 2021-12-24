@@ -40,7 +40,6 @@ jobs:
         else
           echo "upstream-branch=${{ inputs.upstream-branch }}" >> $GITHUB_ENV;
         fi
-        return 0
 
     - name: pull upstream
       run: |

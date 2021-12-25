@@ -60,10 +60,11 @@ jobs:
         xvfb-run ./gradlew build
 
     # sometimes tests don't reach done and thus fail, TODO: figure out what to do when this happens
+    # as a work around we always upload the jar now
 
     - name: Upload Jar
       uses: actions/upload-artifact@v2
-      if: ${{ env.ACT || success() }} # gradle test seems to sometimes time out or something, checking if we are acting allows us to pretend that all the tests passed
+      if: ${{ env.ACT || success() || always() }} # gradle test seems to sometimes time out or something, checking if we are acting allows us to pretend that all the tests passed
       with:
         name: CC-Next-${{ inputs.branch }} # we have multiple branches running on the same workflow trigger, people probably don't want all the jar files
         path: build/libs

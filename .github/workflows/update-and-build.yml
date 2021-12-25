@@ -78,26 +78,26 @@ jobs:
 
  ## I feel like what I should be doing is pulling from CC:T and then merging in the PR
 
-  update-mc-1_16_x+PR990:
+  update-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-updater.yml@CCN/main
     with:
       branch: CCN/mc-1.16.x+PR990
       upstream-repo: https://github.com/MCJack123/CC-Tweaked.git
       upstream-branch: feature/lua-5.2
 
-  merge-tracking-with-mc-1_16_x+PR990:
+  merge-tracking-with-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
-    needs: [update-mc-1_16_x, mc-1_16_x+PR990]
+    needs: [update-mc-1_16_x, mc-1_16_x_PR990]
     with:
       to-branch: CCN/mc-1.16.x+PR990
       from-branch: mc-1.16.x
 
-  build-mc-1_16_x+PR990:
+  build-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: [update-mc-1_16_x+PR990, merge-tracking-with-mc-1_16_x+PR990]
+    needs: [update-mc-1_16_x_PR990, merge-tracking-with-mc-1_16_x_PR990]
     with:
       branch: mc-1.16.x
-      upstreamCommit:  ${{ needs.update-mc-1_16_x+PR990.outputs.upstreamCommit }}
+      upstreamCommit:  ${{ needs.update-mc-1_16_x_PR990.outputs.upstreamCommit }}
       extraVersionInfo: PR990
       preBuildAction: |
         wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'

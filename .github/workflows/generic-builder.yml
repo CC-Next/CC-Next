@@ -12,7 +12,7 @@ on:
       extraVersionInfo:
         required: false
         type: string
-      preBuildction:
+      preBuildAction:
         required: false
         type: string
 

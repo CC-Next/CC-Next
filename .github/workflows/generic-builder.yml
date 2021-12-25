@@ -93,5 +93,5 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ (env.ACT || success() || always()) && inputs.extraVersionInfo }}
       with:
-        name: CC-Next-${{ inputs.branch }}+${{ inputs.extraVersionInfo }}
+        name: CC-Next-${{ inputs.branch }}+(${{ inputs.extraVersionInfo }})
         path: build/libs

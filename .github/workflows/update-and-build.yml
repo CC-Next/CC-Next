@@ -87,7 +87,7 @@ jobs:
 
   merge-tracking-with-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
-    needs: [update-mc-1_16_x, mc-1_16_x_PR990]
+    needs: [update-mc-1_16_x, update-mc-1_16_x_PR990]
     with:
       to-branch: CCN/mc-1.16.x+PR990
       from-branch: mc-1.16.x

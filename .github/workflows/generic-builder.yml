@@ -13,7 +13,7 @@ on:
         required: false
         type: string
       preBuildction:
-        required:false
+        required: false
         type: string
 
 jobs:

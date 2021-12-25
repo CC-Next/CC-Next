@@ -66,7 +66,7 @@ jobs:
 
     # this exists just so that we can download prerelease cobalt for PR990
     - name: Pre build action
-      if: ${{ inputs.preBuildAction != "" }}
+      if: ${{ inputs.preBuildAction }}
       run: |
         echo ${{ inputs.preBuildAction }} > ./preBuildAction.sh
         chmod a+x ./preBuildAction.sh

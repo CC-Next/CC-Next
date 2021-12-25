@@ -54,6 +54,8 @@ Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/
 
 If your download's commit ID doesn't match the branch it's built from then wait a while and download again, the builds can take a little while (> 7 mins for some) and will only take longer as more PRs get added. It also seems that nightly.link can take a moment to notice that there are new builds, I belive that logged in users can download [direct from Github](https://github.com/CC-Next/CC-Next/actions/workflows/update-and-build.yml).
 
+Don't worry to much if the build fails, it seems to be that the tests time out and that fails the build dispite still making a viable mod jar.
+
 ## Quality
 
 Being bleeding edge there will be a bit less quality on newer features, translations come to mind but balance and other things are also considerations. This is somewhat the point of CC:N, to find what parts of a PR needs to change from a gameplay point of view (with the traditional PR code review process doing code quality and such).

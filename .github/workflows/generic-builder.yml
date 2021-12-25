@@ -57,7 +57,7 @@ jobs:
         extraVersionInfo=${{ inputs.extraVersionInfo }}
 
         if [ $extraVersionInfo != "" ]; then
-          extraVersionInfo=+($extraVersionInfo)
+          extraVersionInfo=+\($extraVersionInfo\)
         fi
 
         versionNumber=+${upstreamCommit:0:7}+${ourCommit:0:7}$extraVersionInfo

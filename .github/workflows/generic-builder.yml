@@ -9,6 +9,12 @@ on:
       upstreamCommit:
         required: true
         type: string
+      extraVersionInfo:
+        required: false
+        type: string
+      preBuildction:
+        required:false
+        type: string
 
 jobs:
   build-branch:
@@ -44,14 +50,27 @@ jobs:
         mkdir -p ~/.gradle
         echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
-    # TODO: add PRs to versionNumber
     - name: Add commit ids to the version number
       run: |
-        upstreamCommit=${{ inputs.upstreamCommit}}
+        upstreamCommit=${{ inputs.upstreamCommit }}
         ourCommit=`git rev-parse HEAD`
-        versionNumber=+${upstreamCommit:0:7}+${ourCommit:0:7}
+        extraVersionInfo=${{ inputs.extraVersionInfo }}
+
+        if [ $extraVersionInfo != "" ]; then
+          extraVersionInfo=+($extraVersionInfo)
+        fi
+
+        versionNumber=+${upstreamCommit:0:7}+${ourCommit:0:7}$extraVersionInfo
         sed -r 's/(mod_version=[0-9\.]+)/\1'$versionNumber'/' gradle.properties > gradle.properties.new
         mv gradle.properties.new gradle.properties
+
+    # this exists just so that we can download prerelease cobalt for PR990
+    - name: Pre build action
+      if: ${{ inputs.preBuildAction != "" }}
+      run: |
+        echo ${{ inputs.preBuildAction }} > ./preBuildAction.sh
+        chmod a+x ./preBuildAction.sh
+        ./preBuildAction.sh
 
     - name: Build with Gradle
       run: |

@@ -29,7 +29,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 version = mod_version
 
 group = "org.squiddev"
-archivesBaseName = "cc-tweaked-${mc_version}"
+archivesBaseName = "cc-next-${mc_version}"
 
 def javaVersion = JavaLanguageVersion.of(8)
 java {
@@ -158,7 +158,7 @@ dependencies {
 
     testModImplementation sourceSets.main.output
 
-    cctJavadoc 'cc.tweaked:cct-javadoc:1.4.4'
+    cctJavadoc 'cc.tweaked:cct-javadoc:1.4.5'
 }
 
 // Compile tasks
@@ -194,7 +194,7 @@ jar {
             "Specification-Title"     : "computercraft",
             "Specification-Vendor"    : "SquidDev",
             "Specification-Version"   : "1",
-            "Implementation-Title"    : "CC: Tweaked",
+            "Implementation-Title"    : "CC: Next",
             "Implementation-Version"  : "${mod_version}",
             "Implementation-Vendor"   : "SquidDev",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
@@ -273,18 +273,7 @@ task rollup(type: Exec) {
     commandLine mkCommand('"node_modules/.bin/rollup" --config rollup.config.js')
 }
 
-task minifyWeb(type: Exec, dependsOn: rollup) {
-    group = "build"
-    description = "Bundles JS into rollup"
-
-    inputs.file("$buildDir/rollup/index.js").withPropertyName("sources")
-    inputs.file("package-lock.json").withPropertyName("package-lock.json")
-    outputs.file("$buildDir/rollup/index.min.js").withPropertyName("output")
-
-    commandLine mkCommand('"node_modules/.bin/terser"' + " -o '$buildDir/rollup/index.min.js' '$buildDir/rollup/index.js'")
-}
-
-task illuaminateDocs(type: Exec, dependsOn: [minifyWeb, luaJavadoc]) {
+task illuaminateDocs(type: Exec, dependsOn: [rollup, luaJavadoc]) {
     group = "build"
     description = "Bundles JS into rollup"
 
@@ -292,7 +281,7 @@ task illuaminateDocs(type: Exec, dependsOn: [minifyWeb, luaJavadoc]) {
     inputs.files(fileTree("src/main/resources/data/computercraft/lua/rom")).withPropertyName("lua rom")
     inputs.file("illuaminate.sexp").withPropertyName("illuaminate.sexp")
     inputs.dir("$buildDir/docs/luaJavadoc")
-    inputs.file("$buildDir/rollup/index.min.js").withPropertyName("scripts")
+    inputs.file("$buildDir/rollup/index.js").withPropertyName("scripts")
     inputs.file("src/web/styles.css").withPropertyName("styles")
     outputs.dir("$buildDir/docs/lua")
 
@@ -300,9 +289,13 @@ task illuaminateDocs(type: Exec, dependsOn: [minifyWeb, luaJavadoc]) {
 }
 
 task docWebsite(type: Copy, dependsOn: [illuaminateDocs]) {
-    from 'doc'
-    include 'logo.png'
-    include 'images/**'
+    from('doc') {
+        include 'logo.png'
+        include 'images/**'
+    }
+    from("$buildDir/rollup") {
+        exclude 'index.js'
+    }
     into "${project.docsDir}/lua"
 }
 
@@ -468,7 +461,7 @@ task checkRelease {
         if (!ok) throw new IllegalStateException("Could not check release")
     }
 }
-check.dependsOn checkRelease
+//check.dependsOn checkRelease
 
 curseforge {
     apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''

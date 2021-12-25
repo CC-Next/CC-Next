@@ -37,7 +37,7 @@ jobs:
 
   build-mc-1_17_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: merge-mc-1_17_x-with-mc-1_16_x
+    needs: [update-mc-1_17_x, merge-mc-1_17_x-with-mc-1_16_x]
     with:
       branch: mc-1.17.x
       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
@@ -58,7 +58,7 @@ jobs:
 
   build-mc-1_18_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: merge-mc-1_18_x-with-mc-1_17_x
+    needs: [update-mc-1_18_x, merge-mc-1_18_x-with-mc-1_17_x]
     with:
       branch: mc-1.18.x
       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}

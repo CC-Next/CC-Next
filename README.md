@@ -47,7 +47,7 @@ TODO: the following files reference CC:T and I'm reluctant to change them
 
 ## About
 
-Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/cc-tweaked/CC-Tweaked) with some extra features from pull requests thrown in. We expect to have bugs and issues and that's the point, we also are not holding to ourselves to the same version migration requirements that CC:T has.
+Our intent here is to provide bleeding edge builds of [CC:T](https://github.com/cc-tweaked/CC-Tweaked) with some extra features from pull requests thrown in. We expect to have bugs and issues and that's the point. We also are not holding ourselves to the same version migration requirements that CC:T has, which means that your world might break if you try to upgrade the mod - do so at your own risk and make backups.
 
 ## Link To Builds
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/CC-Next/CC-Next/mc-1.18.x?label=updated)  ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/CC-Next/CC-Next/update-and-build)  [![download](https://img.shields.io/badge/download-latest%20jars-brightgreen)](https://nightly.link/CC-Next/CC-Next/workflows/update-and-build/CCN%2Fmain)

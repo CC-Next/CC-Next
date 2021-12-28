@@ -29,7 +29,7 @@ jobs:
     with:
       branch: mc-1.17.x
 
-  merge-mc-1_17_x-with-mc-1_16_x:
+  merge-mc-1_16_x-into-mc-1_17_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
     needs: [update-mc-1_16_x, update-mc-1_17_x]
     with:
@@ -38,7 +38,7 @@ jobs:
 
   build-mc-1_17_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: [update-mc-1_17_x, merge-mc-1_17_x-with-mc-1_16_x]
+    needs: [update-mc-1_17_x, merge-mc-1_16_x-into-mc-1_17_x]
     with:
       branch: mc-1.17.x
       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
@@ -50,16 +50,16 @@ jobs:
     with:
       branch: mc-1.18.x
 
-  merge-mc-1_18_x-with-mc-1_17_x:
+  merge-mc-1_17_x-into-mc-1_18_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
-    needs: [update-mc-1_18_x, merge-mc-1_17_x-with-mc-1_16_x]
+    needs: [update-mc-1_18_x, merge-mc-1_16_x-into-mc-1_17_x]
     with:
       to-branch: mc-1.18.x
       from-branch: mc-1.17.x
 
   build-mc-1_18_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: [update-mc-1_18_x, merge-mc-1_18_x-with-mc-1_17_x]
+    needs: [update-mc-1_18_x, merge-mc-1_17_x-into-mc-1_18_x]
     with:
       branch: mc-1.18.x
       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
@@ -85,7 +85,7 @@ jobs:
       upstream-repo: https://github.com/MCJack123/CC-Tweaked.git
       upstream-branch: feature/lua-5.2
 
-  merge-tracking-with-mc-1_16_x_PR990:
+  merge-mc-1_16_x-into-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
     needs: [update-mc-1_16_x, update-mc-1_16_x_PR990]
     with:
@@ -94,7 +94,7 @@ jobs:
 
   build-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: [update-mc-1_16_x_PR990, merge-tracking-with-mc-1_16_x_PR990]
+    needs: [update-mc-1_16_x_PR990, merge-mc-1_16_x-into-mc-1_16_x_PR990]
     with:
       branch: mc-1.16.x
       upstreamCommit:  ${{ needs.update-mc-1_16_x_PR990.outputs.upstreamCommit }}
@@ -105,42 +105,47 @@ jobs:
 
 #####
 
-#   update-mc-1_17_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-updater.yml@CCN/main
-#     with:
-#       branch: mc-1.17.x
+   merge-mc-1_17_x-into-mc-1_17_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
+    needs: [update-mc-1_17_x]
+    with:
+      to-branch: CCN/mc-1.17.x+PR990
+      from-branch: mc-1.17.x
 
-#   merge-mc-1_17_x-with-mc-1_16_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
-#     needs: [update-mc-1_16_x, update-mc-1_17_x]
-#     with:
-#       to-branch: mc-1.17.x
-#       from-branch: mc-1.16.x
+  merge-mc-1_16_x_PR990-into-mc-1_17_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
+    needs: [merge-mc-1_17_x-with-mc-1_17_x+PR990, merge-mc-1_16_x-into-mc-1_16_x_PR990]
+    with:
+      to-branch: CCN/mc-1.17.x+PR990
+      from-branch: CCN/mc-1.16.x+PR990
 
-#   build-mc-1_17_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-#     needs: [update-mc-1_17_x, merge-mc-1_17_x-with-mc-1_16_x]
-#     with:
-#       branch: mc-1.17.x
-#       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
+  build-mc-1_17_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
+    needs: [update-mc-1_17_x, merge-mc-1_16_x_PR990-into-mc-1_17_x+PR990]
+    with:
+      branch: CCN/mc-1.17.x+PR990
+      upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
 
-# #####
+#####
 
-#   update-mc-1_18_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-updater.yml@CCN/main
-#     with:
-#       branch: mc-1.18.x
+   merge-mc-1_18_x-into-mc-1_18_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
+    needs: [update-mc-1_18_x]
+    with:
+      to-branch: CCN/mc-1.18.x+PR990
+      from-branch: mc-1.18.x
 
-#   merge-mc-1_18_x-with-mc-1_17_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
-#     needs: [update-mc-1_18_x, merge-mc-1_17_x-with-mc-1_16_x]
-#     with:
-#       to-branch: mc-1.18.x
-#       from-branch: mc-1.17.x
+  merge-mc-1_17_x_PR990-into-mc-1_18_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-merger.yml@CCN/main
+    needs: [merge-mc-1_18_x-with-mc-1_18_x+PR990, merge-mc-1_17_x-into-mc-1_17_x_PR990]
+    with:
+      to-branch: CCN/mc-1.18.x+PR990
+      from-branch: CCN/mc-1.17.x+PR990
 
-#   build-mc-1_18_x:
-#     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-#     needs: [update-mc-1_18_x, merge-mc-1_18_x-with-mc-1_17_x]
-#     with:
-#       branch: mc-1.18.x
-#       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
+  build-mc-1_18_x+PR990:
+    uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
+    needs: [update-mc-1_18_x, merge-mc-1_17_x_PR990-into-mc-1_18_x+PR990]
+    with:
+      branch: CCN/mc-1.18.x+PR990
+      upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
+

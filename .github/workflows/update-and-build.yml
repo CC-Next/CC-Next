@@ -9,6 +9,7 @@ on:
     - cron:  '0 0 * * *'
 
 jobs:
+
   update-mc-1_16_x:
     uses: CC-Next/CC-Next/.github/workflows/generic-updater.yml@CCN/main
     with:

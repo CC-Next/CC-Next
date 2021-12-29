@@ -68,9 +68,9 @@ jobs:
     - name: Pre build action
       if: ${{ inputs.preBuildAction }}
       run: |
-        echo ${{ inputs.preBuildAction }} > ./preBuildAction.sh
-        chmod a+x ./preBuildAction.sh
-        bash ./preBuildAction.sh
+        bash <<EOF
+        ${{ inputs.preBuildAction }}
+        EOF
 
     - name: Build with Gradle
       run: |

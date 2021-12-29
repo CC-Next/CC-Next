@@ -94,10 +94,10 @@ jobs:
 
   build-mc-1_16_x_PR990:
     uses: CC-Next/CC-Next/.github/workflows/generic-builder.yml@CCN/main
-    needs: [update-mc-1_16_x_PR990, merge-mc-1_16_x-into-mc-1_16_x_PR990]
+    needs: [update-mc-1_16_x, merge-mc-1_16_x-into-mc-1_16_x_PR990]
     with:
       branch: mc-1.16.x
-      upstreamCommit:  ${{ needs.update-mc-1_16_x_PR990.outputs.upstreamCommit }}
+      upstreamCommit:  ${{ needs.update-mc-1_16_x.outputs.upstreamCommit }}
       extraVersionInfo: PR990
       preBuildAction: |
         wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
@@ -125,6 +125,9 @@ jobs:
     with:
       branch: CCN/mc-1.17.x+PR990
       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
+      extraVersionInfo: PR990
+      preBuildAction: |
+        wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
 
 #####
 
@@ -148,4 +151,7 @@ jobs:
     with:
       branch: CCN/mc-1.18.x+PR990
       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
+      extraVersionInfo: PR990
+      preBuildAction: |
+        wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
 

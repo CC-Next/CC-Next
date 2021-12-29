@@ -68,9 +68,7 @@ jobs:
     - name: Pre build action
       if: ${{ inputs.preBuildAction }}
       run: |
-        bash <<EOF
-        ${{ inputs.preBuildAction }}
-        EOF
+        bash -c ${{ inputs.preBuildAction }}
 
     - name: Build with Gradle
       run: |

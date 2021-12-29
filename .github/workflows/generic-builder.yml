@@ -12,6 +12,9 @@ on:
       extraVersionInfo:
         required: false
         type: string
+      mcVersion:
+        required: true
+        type: string
       preBuildAction:
         required: false
         type: string
@@ -83,7 +86,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ (env.ACT || success() || always()) && !inputs.extraVersionInfo }} # gradle test seems to sometimes time out or something, checking if we are acting allows us to pretend that all the tests passed
       with:
-        name: CC-Next-${{ inputs.branch }} # TODO: extras onto here # we have multiple branches running on the same workflow trigger, people probably don't want all the jar files
+        name: CC-Next-${{ inputs.mcVersion }} # TODO: extras onto here # we have multiple branches running on the same workflow trigger, people probably don't want all the jar files
         path: build/libs
 
     # not a fan of it this way but it's Christmas and I have otherthings I want to do today
@@ -91,5 +94,5 @@ jobs:
       uses: actions/upload-artifact@v2
       if: ${{ (env.ACT || success() || always()) && inputs.extraVersionInfo }}
       with:
-        name: CC-Next-${{ inputs.branch }}+(${{ inputs.extraVersionInfo }})
+        name: CC-Next-${{ inputs.mcVersion }}+(${{ inputs.extraVersionInfo }})
         path: build/libs

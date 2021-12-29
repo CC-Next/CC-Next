@@ -20,6 +20,7 @@ jobs:
     needs: update-mc-1_16_x
     with:
       branch: mc-1.16.x
+      mcVersion: mc-1.16.x
       upstreamCommit:  ${{ needs.update-mc-1_16_x.outputs.upstreamCommit }}
 
 #####
@@ -41,6 +42,7 @@ jobs:
     needs: [update-mc-1_17_x, merge-mc-1_16_x-into-mc-1_17_x]
     with:
       branch: mc-1.17.x
+      mcVersion: mc-1.17.x
       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
 
 #####
@@ -62,6 +64,7 @@ jobs:
     needs: [update-mc-1_18_x, merge-mc-1_17_x-into-mc-1_18_x]
     with:
       branch: mc-1.18.x
+      mcVersion: mc-1.18.x
       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
 
  ###############
@@ -99,6 +102,7 @@ jobs:
       branch: mc-1.16.x
       upstreamCommit:  ${{ needs.update-mc-1_16_x.outputs.upstreamCommit }}
       extraVersionInfo: PR990
+      mcVersion: mc-1.16.x
       preBuildAction: |
         wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
 
@@ -126,6 +130,7 @@ jobs:
       branch: CCN/mc-1.17.x+PR990
       upstreamCommit:  ${{ needs.update-mc-1_17_x.outputs.upstreamCommit }}
       extraVersionInfo: PR990
+      mcVersion: mc-1.17.x
       preBuildAction: |
         wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
 
@@ -152,6 +157,7 @@ jobs:
       branch: CCN/mc-1.18.x+PR990
       upstreamCommit:  ${{ needs.update-mc-1_18_x.outputs.upstreamCommit }}
       extraVersionInfo: PR990
+      mcVersion: mc-1.18.x
       preBuildAction: |
         wget 'https://github.com/CC-Next/Cobalt/releases/download/0.5.4%2B859205c%2B484ae62%2B(PR50)/Cobalt-0.5.4+859205c+484ae62+.PR50.jar'
 

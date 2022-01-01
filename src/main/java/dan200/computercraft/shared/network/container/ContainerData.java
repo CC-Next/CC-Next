@@ -5,40 +5,69 @@
  */
 package dan200.computercraft.shared.network.container;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.IContainerFactory;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * An extension over the basic {@link IForgeContainerType}/{@link NetworkHooks#openGui(ServerPlayerEntity, INamedContainerProvider, Consumer)}
+ * An extension over the basic {@link IForgeContainerType}/{@link NetworkHooks#openGui(ServerPlayer, MenuProvider, Consumer)}
  * hooks, with a more convenient way of reading and writing data.
  */
 public interface ContainerData
 {
-    void toBytes( PacketBuffer buf );
+    void toBytes( FriendlyByteBuf buf );
 
-    default void open( PlayerEntity player, INamedContainerProvider owner )
+    default void open( Player player, MenuProvider owner )
     {
-        NetworkHooks.openGui( (ServerPlayerEntity) player, owner, this::toBytes );
+        NetworkHooks.openGui( (ServerPlayer) player, owner, this::toBytes );
     }
 
-    static <C extends Container, T extends ContainerData> ContainerType<C> toType( Function<PacketBuffer, T> reader, Factory<C, T> factory )
+    static <C extends AbstractContainerMenu, T extends ContainerData> MenuType<C> toType( Function<FriendlyByteBuf, T> reader, Factory<C, T> factory )
     {
         return IForgeContainerType.create( ( id, player, data ) -> factory.create( id, player, reader.apply( data ) ) );
     }
 
-    interface Factory<C extends Container, T extends ContainerData>
+    static <C extends AbstractContainerMenu, T extends ContainerData> MenuType<C> toType( Function<FriendlyByteBuf, T> reader, FixedFactory<C, T> factory )
     {
-        C create( int id, @Nonnull PlayerInventory inventory, T data );
+        return new FixedPointContainerFactory<>( reader, factory ).type;
+    }
+
+    interface Factory<C extends AbstractContainerMenu, T extends ContainerData>
+    {
+        C create( int id, @Nonnull Inventory inventory, T data );
+    }
+
+    interface FixedFactory<C extends AbstractContainerMenu, T extends ContainerData>
+    {
+        C create( MenuType<C> type, int id, @Nonnull Inventory inventory, T data );
+    }
+
+    class FixedPointContainerFactory<C extends AbstractContainerMenu, T extends ContainerData> implements IContainerFactory<C>
+    {
+        private final IContainerFactory<C> impl;
+        private final MenuType<C> type;
+
+        private FixedPointContainerFactory( Function<FriendlyByteBuf, T> reader, FixedFactory<C, T> factory )
+        {
+            MenuType<C> type = this.type = IForgeContainerType.create( this );
+            impl = ( id, player, data ) -> factory.create( type, id, player, reader.apply( data ) );
+        }
+
+        @Override
+        public C create( int windowId, Inventory inv, FriendlyByteBuf data )
+        {
+            return impl.create( windowId, inv, data );
+        }
     }
 }

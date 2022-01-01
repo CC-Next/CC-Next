@@ -8,7 +8,7 @@ package dan200.computercraft.core.tracking;
 import com.google.common.base.CaseFormat;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.computer.Computer;
-import net.minecraft.util.text.LanguageMap;
+import net.minecraft.locale.Language;
 
 import javax.annotation.Nonnull;
 import javax.management.*;
@@ -44,7 +44,7 @@ public final class ComputerMBean implements DynamicMBean, Tracker
         add( "task", TrackingField.TOTAL_TIME, attributes, TrackingField.TASKS );
         add( "serverTask", TrackingField.SERVER_TIME, attributes, TrackingField.SERVER_COUNT );
 
-        this.info = new MBeanInfo(
+        info = new MBeanInfo(
             ComputerMBean.class.getSimpleName(),
             "metrics about all computers on the server",
             attributes.toArray( new MBeanAttributeInfo[0] ), null, null, null
@@ -69,7 +69,7 @@ public final class ComputerMBean implements DynamicMBean, Tracker
     }
 
     @Override
-    public Object getAttribute( String attribute ) throws AttributeNotFoundException, MBeanException, ReflectionException
+    public Object getAttribute( String attribute ) throws AttributeNotFoundException
     {
         LongSupplier value = attributes.get( attribute );
         if( value == null ) throw new AttributeNotFoundException();
@@ -95,7 +95,7 @@ public final class ComputerMBean implements DynamicMBean, Tracker
     }
 
     @Override
-    public Object invoke( String actionName, Object[] params, String[] signature ) throws MBeanException, ReflectionException
+    public Object invoke( String actionName, Object[] params, String[] signature )
     {
         return null;
     }
@@ -138,18 +138,18 @@ public final class ComputerMBean implements DynamicMBean, Tracker
         Counter counter = new Counter();
         values.put( field, counter );
 
-        String prettyName = LanguageMap.getInstance().getOrDefault( field.translationKey() );
+        String prettyName = Language.getInstance().getOrDefault( field.translationKey() );
         attributes.add( addAttribute( name, prettyName, counter.value::longValue ) );
         if( count != null )
         {
-            String countName = LanguageMap.getInstance().getOrDefault( count.translationKey() );
+            String countName = Language.getInstance().getOrDefault( count.translationKey() );
             attributes.add( addAttribute( name + "Count", countName, counter.count::longValue ) );
         }
     }
 
     private static class Counter
     {
-        AtomicLong value = new AtomicLong();
-        AtomicLong count = new AtomicLong();
+        final AtomicLong value = new AtomicLong();
+        final AtomicLong count = new AtomicLong();
     }
 }

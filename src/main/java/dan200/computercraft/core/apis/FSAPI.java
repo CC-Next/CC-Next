@@ -30,7 +30,36 @@ import java.util.OptionalLong;
 import java.util.function.Function;
 
 /**
- * The FS API allows you to manipulate files and the filesystem.
+ * The FS API provides access to the computer's files and filesystem, allowing you to manipulate files, directories and
+ * paths. This includes:
+ *
+ * <ul>
+ * <li>**Reading and writing files:** Call {@link #open} to obtain a file "handle", which can be used to read from or
+ * write to a file.</li>
+ * <li>**Path manipulation:** {@link #combine}, {@link #getName} and {@link #getDir} allow you to manipulate file
+ * paths, joining them together or extracting components.</li>
+ * <li>**Querying paths:** For instance, checking if a file exists, or whether it's a directory. See {@link #getSize},
+ * {@link #exists}, {@link #isDir}, {@link #isReadOnly} and {@link #attributes}.</li>
+ * <li>**File and directory manipulation:** For instance, moving or copying files. See {@link #makeDir}, {@link #move},
+ * {@link #copy} and {@link #delete}.</li>
+ * </ul>
+ *
+ * :::note
+ * All functions in the API work on absolute paths, and do not take the @{shell.dir|current directory} into account.
+ * You can use @{shell.resolve} to convert a relative path into an absolute one.
+ * :::
+ *
+ * ## Mounts
+ * While a computer can only have one hard drive and filesystem, other filesystems may be "mounted" inside it. For
+ * instance, the {@link dan200.computercraft.shared.peripheral.diskdrive.DiskDrivePeripheral drive peripheral} mounts
+ * its disk's contents at {@code "disk/"}, {@code "disk1/"}, etc...
+ *
+ * You can see which mount a path belongs to with the {@link #getDrive} function. This returns {@code "hdd"} for the
+ * computer's main filesystem ({@code "/"}), {@code "rom"} for the rom ({@code "rom/"}).
+ *
+ * Most filesystems have a limited capacity, operations which would cause that capacity to be reached (such as writing
+ * an incredibly large file) will fail. You can see a mount's capacity with {@link #getCapacity} and the remaining
+ * space with {@link #getFreeSpace}.
  *
  * @cc.module fs
  */
@@ -99,6 +128,7 @@ public class FSAPI implements ILuaAPI
      * @throws LuaException On argument errors.
      * @cc.tparam string path The first part of the path. For example, a parent directory path.
      * @cc.tparam string ... Additional parts of the path to combine.
+     * @cc.changed 1.95.0 Now supports multiple arguments.
      * @cc.usage Combine several file paths together
      * <pre>{@code
      * fs.combine("/rom/programs", "../apis", "parallel.lua")
@@ -126,6 +156,7 @@ public class FSAPI implements ILuaAPI
      *
      * @param path The path to get the name from.
      * @return The final part of the path (the file name).
+     * @cc.since 1.2
      * @cc.usage Get the file name of {@code rom/startup.lua}
      * <pre>{@code
      * fs.getName("rom/startup.lua")
@@ -143,6 +174,7 @@ public class FSAPI implements ILuaAPI
      *
      * @param path The path to get the directory from.
      * @return The path with the final part removed (the parent directory).
+     * @cc.since 1.63
      * @cc.usage Get the directory name of {@code rom/startup.lua}
      * <pre>{@code
      * fs.getDir("rom/startup.lua")
@@ -161,6 +193,7 @@ public class FSAPI implements ILuaAPI
      * @param path The file to get the file size of.
      * @return The size of the file, in bytes.
      * @throws LuaException If the path doesn't exist.
+     * @cc.since 1.3
      */
     @LuaFunction
     public final long getSize( String path ) throws LuaException
@@ -436,6 +469,12 @@ public class FSAPI implements ILuaAPI
      * @return The name of the drive that the file is on; e.g. {@code hdd} for local files, or {@code rom} for ROM files.
      * @throws LuaException If the path doesn't exist.
      * @cc.treturn string The name of the drive that the file is on; e.g. {@code hdd} for local files, or {@code rom} for ROM files.
+     * @cc.usage Print the drives of a couple of mounts:
+     *
+     * <pre>{@code
+     * print("/: " .. fs.getDrive("/"))
+     * print("/rom/: " .. fs.getDrive("rom"))
+     * }</pre>
      */
     @LuaFunction
     public final Object[] getDrive( String path ) throws LuaException
@@ -457,8 +496,9 @@ public class FSAPI implements ILuaAPI
      * @param path The path to check the free space for.
      * @return The amount of free space available, in bytes.
      * @throws LuaException If the path doesn't exist.
-     * @see #getCapacity To get the capacity of this drive.
      * @cc.treturn number|"unlimited" The amount of free space available, in bytes, or "unlimited".
+     * @cc.since 1.4
+     * @see #getCapacity To get the capacity of this drive.
      */
     @LuaFunction
     public final Object getFreeSpace( String path ) throws LuaException
@@ -479,12 +519,13 @@ public class FSAPI implements ILuaAPI
      *
      * This string is formatted like a normal path string, but can include any
      * number of wildcards ({@code *}) to look for files matching anything.
-     * For example, {@code rom/* /command*} will look for any path starting with
+     * For example, <code>rom/&#42;/command*</code> will look for any path starting with
      * {@code command} inside any subdirectory of {@code /rom}.
      *
      * @param path The wildcard-qualified path to search for.
      * @return A list of paths that match the search string.
      * @throws LuaException If the path doesn't exist.
+     * @cc.since 1.6
      */
     @LuaFunction
     public final String[] find( String path ) throws LuaException
@@ -506,9 +547,10 @@ public class FSAPI implements ILuaAPI
      * @param path The path of the drive to get.
      * @return The drive's capacity.
      * @throws LuaException If the capacity cannot be determined.
-     * @see #getFreeSpace To get the free space available on this drive.
      * @cc.treturn number|nil This drive's capacity. This will be nil for "read-only" drives, such as the ROM or
      * treasure disks.
+     * @cc.since 1.87.0
+     * @see #getFreeSpace To get the free space available on this drive.
      */
     @LuaFunction
     public final Object getCapacity( String path ) throws LuaException
@@ -537,6 +579,9 @@ public class FSAPI implements ILuaAPI
      * @return The resulting attributes.
      * @throws LuaException If the path does not exist.
      * @cc.treturn { size = number, isDir = boolean, isReadOnly = boolean, created = number, modified = number } The resulting attributes.
+     * @cc.since 1.87.0
+     * @cc.changed 1.91.0 Renamed `modification` field to `modified`.
+     * @cc.changed 1.95.2 Added `isReadOnly` to attributes.
      * @see #getSize If you only care about the file's size.
      * @see #isDir If you only care whether a path is a directory or not.
      */

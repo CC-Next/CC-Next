@@ -5,18 +5,16 @@
  */
 package dan200.computercraft.client.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.client.gui.widgets.ComputerSidebar;
 import dan200.computercraft.client.gui.widgets.WidgetTerminal;
 import dan200.computercraft.client.render.ComputerBorderRenderer;
-import dan200.computercraft.shared.computer.inventory.ContainerComputer;
+import dan200.computercraft.client.render.RenderTypes;
 import dan200.computercraft.shared.computer.inventory.ContainerComputerBase;
 import dan200.computercraft.shared.computer.inventory.ContainerViewComputer;
-import dan200.computercraft.shared.pocket.inventory.ContainerPocketComputer;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 import javax.annotation.Nonnull;
 
@@ -28,7 +26,7 @@ public final class GuiComputer<T extends ContainerComputerBase> extends Computer
     private final int termHeight;
 
     private GuiComputer(
-        T container, PlayerInventory player, ITextComponent title, int termWidth, int termHeight
+        T container, Inventory player, Component title, int termWidth, int termHeight
     )
     {
         super( container, player, title, BORDER );
@@ -39,7 +37,8 @@ public final class GuiComputer<T extends ContainerComputerBase> extends Computer
         imageHeight = WidgetTerminal.getHeight( termHeight ) + BORDER * 2;
     }
 
-    public static GuiComputer<ContainerComputer> create( ContainerComputer container, PlayerInventory inventory, ITextComponent component )
+    @Nonnull
+    public static GuiComputer<ContainerComputerBase> create( ContainerComputerBase container, Inventory inventory, Component component )
     {
         return new GuiComputer<>(
             container, inventory, component,
@@ -47,7 +46,8 @@ public final class GuiComputer<T extends ContainerComputerBase> extends Computer
         );
     }
 
-    public static GuiComputer<ContainerPocketComputer> createPocket( ContainerPocketComputer container, PlayerInventory inventory, ITextComponent component )
+    @Nonnull
+    public static GuiComputer<ContainerComputerBase> createPocket( ContainerComputerBase container, Inventory inventory, Component component )
     {
         return new GuiComputer<>(
             container, inventory, component,
@@ -55,7 +55,8 @@ public final class GuiComputer<T extends ContainerComputerBase> extends Computer
         );
     }
 
-    public static GuiComputer<ContainerViewComputer> createView( ContainerViewComputer container, PlayerInventory inventory, ITextComponent component )
+    @Nonnull
+    public static GuiComputer<ContainerViewComputer> createView( ContainerViewComputer container, Inventory inventory, Component component )
     {
         return new GuiComputer<>(
             container, inventory, component,
@@ -72,12 +73,13 @@ public final class GuiComputer<T extends ContainerComputerBase> extends Computer
     }
 
     @Override
-    public void renderBg( @Nonnull MatrixStack stack, float partialTicks, int mouseX, int mouseY )
+    public void renderBg( @Nonnull PoseStack stack, float partialTicks, int mouseX, int mouseY )
     {
         // Draw a border around the terminal
-        RenderSystem.color4f( 1, 1, 1, 1 );
-        minecraft.getTextureManager().bind( ComputerBorderRenderer.getTexture( family ) );
-        ComputerBorderRenderer.render( terminal.x, terminal.y, getBlitOffset(), terminal.getWidth(), terminal.getHeight() );
+        ComputerBorderRenderer.render(
+            ComputerBorderRenderer.getTexture( family ), terminal.x, terminal.y, getBlitOffset(),
+            RenderTypes.FULL_BRIGHT_LIGHTMAP, terminal.getWidth(), terminal.getHeight()
+        );
         ComputerSidebar.renderBackground( stack, leftPos, topPos + sidebarYOffset );
     }
 }

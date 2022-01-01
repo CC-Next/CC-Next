@@ -10,37 +10,37 @@ import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleCommand;
 import dan200.computercraft.api.turtle.TurtleAnimation;
 import dan200.computercraft.api.turtle.TurtleCommandResult;
-import dan200.computercraft.api.turtle.event.TurtleBlockEvent;
 import dan200.computercraft.shared.TurtlePermissions;
 import dan200.computercraft.shared.util.DropConsumer;
 import dan200.computercraft.shared.util.InventoryUtil;
 import dan200.computercraft.shared.util.WorldUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.*;
-import net.minecraft.network.play.client.CUseEntityPacket;
-import net.minecraft.tileentity.SignTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
-
-import static net.minecraftforge.eventbus.api.Event.Result;
 
 public class TurtlePlaceCommand implements ITurtleCommand
 {
@@ -68,9 +68,6 @@ public class TurtlePlaceCommand implements ITurtleCommand
         // Create a fake player, and orient it appropriately
         BlockPos playerPosition = turtle.getPosition().relative( direction );
         TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, playerPosition, direction );
-
-        TurtleBlockEvent.Place place = new TurtleBlockEvent.Place( turtle, turtlePlayer, turtle.getWorld(), coordinates, stack );
-        if( MinecraftForge.EVENT_BUS.post( place ) ) return TurtleCommandResult.failure( place.getFailureMessage() );
 
         // Do the deploying
         turtlePlayer.loadInventory( turtle );
@@ -100,7 +97,7 @@ public class TurtlePlaceCommand implements ITurtleCommand
         TurtlePlayer turtlePlayer = TurtlePlayer.getWithPosition( turtle, playerPosition, direction );
         turtlePlayer.loadInventory( stack );
         boolean result = deploy( stack, turtle, turtlePlayer, direction, extraArguments, outErrorMessage );
-        turtlePlayer.inventory.clearContent();
+        turtlePlayer.getInventory().clearContent();
         return result;
     }
 
@@ -126,18 +123,18 @@ public class TurtlePlaceCommand implements ITurtleCommand
     private static boolean deployOnEntity( @Nonnull ItemStack stack, final ITurtleAccess turtle, TurtlePlayer turtlePlayer )
     {
         // See if there is an entity present
-        final World world = turtle.getWorld();
+        final Level world = turtle.getLevel();
         final BlockPos position = turtle.getPosition();
-        Vector3d turtlePos = turtlePlayer.position();
-        Vector3d rayDir = turtlePlayer.getViewVector( 1.0f );
-        Pair<Entity, Vector3d> hit = WorldUtil.rayTraceEntities( world, turtlePos, rayDir, 1.5 );
+        Vec3 turtlePos = turtlePlayer.position();
+        Vec3 rayDir = turtlePlayer.getViewVector( 1.0f );
+        Pair<Entity, Vec3> hit = WorldUtil.rayTraceEntities( world, turtlePos, rayDir, 1.5 );
         if( hit == null ) return false;
 
         // Start claiming entity drops
         Entity hitEntity = hit.getKey();
-        Vector3d hitPos = hit.getValue();
+        Vec3 hitPos = hit.getValue();
 
-        IItemHandler itemHandler = new InvWrapper( turtlePlayer.inventory );
+        IItemHandler itemHandler = new InvWrapper( turtlePlayer.getInventory() );
         DropConsumer.set( hitEntity, drop -> InventoryUtil.storeItems( drop, itemHandler, 1 ) );
 
         boolean placed = doDeployOnEntity( stack, turtlePlayer, hitEntity, hitPos );
@@ -154,37 +151,37 @@ public class TurtlePlaceCommand implements ITurtleCommand
      * @param hitEntity    The entity we're interacting with.
      * @param hitPos       The position our ray trace hit the entity.
      * @return If this item was deployed.
-     * @see net.minecraft.network.play.ServerPlayNetHandler#handleInteract(CUseEntityPacket)
-     * @see net.minecraft.entity.player.PlayerEntity#interactOn(Entity, Hand)
+     * @see net.minecraft.server.network.ServerGamePacketListenerImpl#handleInteract(ServerboundInteractPacket)
+     * @see net.minecraft.world.entity.player.Player#interactOn(Entity, InteractionHand)
      */
-    private static boolean doDeployOnEntity( @Nonnull ItemStack stack, TurtlePlayer turtlePlayer, @Nonnull Entity hitEntity, @Nonnull Vector3d hitPos )
+    private static boolean doDeployOnEntity( @Nonnull ItemStack stack, TurtlePlayer turtlePlayer, @Nonnull Entity hitEntity, @Nonnull Vec3 hitPos )
     {
         // Placing "onto" a block follows two flows. First we try to interactAt. If that doesn't succeed, then we try to
         // call the normal interact path. Cancelling an interactAt *does not* cancel a normal interact path.
 
-        ActionResultType interactAt = ForgeHooks.onInteractEntityAt( turtlePlayer, hitEntity, hitPos, Hand.MAIN_HAND );
-        if( interactAt == null ) interactAt = hitEntity.interactAt( turtlePlayer, hitPos, Hand.MAIN_HAND );
+        InteractionResult interactAt = ForgeHooks.onInteractEntityAt( turtlePlayer, hitEntity, hitPos, InteractionHand.MAIN_HAND );
+        if( interactAt == null ) interactAt = hitEntity.interactAt( turtlePlayer, hitPos, InteractionHand.MAIN_HAND );
         if( interactAt.consumesAction() ) return true;
 
-        ActionResultType interact = ForgeHooks.onInteractEntity( turtlePlayer, hitEntity, Hand.MAIN_HAND );
+        InteractionResult interact = ForgeHooks.onInteractEntity( turtlePlayer, hitEntity, InteractionHand.MAIN_HAND );
         if( interact != null ) return interact.consumesAction();
 
-        if( hitEntity.interact( turtlePlayer, Hand.MAIN_HAND ).consumesAction() ) return true;
-        if( hitEntity instanceof LivingEntity )
+        if( hitEntity.interact( turtlePlayer, InteractionHand.MAIN_HAND ).consumesAction() ) return true;
+        if( hitEntity instanceof LivingEntity hitLiving )
         {
-            return stack.interactLivingEntity( turtlePlayer, (LivingEntity) hitEntity, Hand.MAIN_HAND ).consumesAction();
+            return stack.interactLivingEntity( turtlePlayer, hitLiving, InteractionHand.MAIN_HAND ).consumesAction();
         }
 
         return false;
     }
 
     private static boolean canDeployOnBlock(
-        @Nonnull BlockItemUseContext context, ITurtleAccess turtle, TurtlePlayer player, BlockPos position,
+        @Nonnull BlockPlaceContext context, ITurtleAccess turtle, TurtlePlayer player, BlockPos position,
         Direction side, boolean allowReplaceable, ErrorMessage outErrorMessage
     )
     {
-        World world = turtle.getWorld();
-        if( !World.isInWorldBounds( position ) || world.isEmptyBlock( position ) ||
+        Level world = turtle.getLevel();
+        if( !world.isInWorldBounds( position ) || world.isEmptyBlock( position ) ||
             (context.getItemInHand().getItem() instanceof BlockItem && WorldUtil.isLiquidBlock( world, position )) )
         {
             return false;
@@ -228,29 +225,29 @@ public class TurtlePlaceCommand implements ITurtleCommand
         if( Math.abs( hitY - 0.5f ) < 0.01f ) hitY = 0.45f;
 
         // Check if there's something suitable to place onto
-        BlockRayTraceResult hit = new BlockRayTraceResult( new Vector3d( hitX, hitY, hitZ ), side, position, false );
-        ItemUseContext context = new ItemUseContext( turtlePlayer, Hand.MAIN_HAND, hit );
-        if( !canDeployOnBlock( new BlockItemUseContext( context ), turtle, turtlePlayer, position, side, allowReplace, outErrorMessage ) )
+        BlockHitResult hit = new BlockHitResult( new Vec3( hitX, hitY, hitZ ), side, position, false );
+        UseOnContext context = new UseOnContext( turtlePlayer, InteractionHand.MAIN_HAND, hit );
+        if( !canDeployOnBlock( new BlockPlaceContext( context ), turtle, turtlePlayer, position, side, allowReplace, outErrorMessage ) )
         {
             return false;
         }
 
         Item item = stack.getItem();
-        TileEntity existingTile = turtle.getWorld().getBlockEntity( position );
+        BlockEntity existingTile = turtle.getLevel().getBlockEntity( position );
 
         boolean placed = doDeployOnBlock( stack, turtlePlayer, position, context, hit ).consumesAction();
 
         // Set text on signs
-        if( placed && item instanceof SignItem && extraArguments != null && extraArguments.length >= 1 && extraArguments[0] instanceof String )
+        if( placed && item instanceof SignItem && extraArguments != null && extraArguments.length >= 1 && extraArguments[0] instanceof String message )
         {
-            World world = turtle.getWorld();
-            TileEntity tile = world.getBlockEntity( position );
+            Level world = turtle.getLevel();
+            BlockEntity tile = world.getBlockEntity( position );
             if( tile == null || tile == existingTile )
             {
                 tile = world.getBlockEntity( position.relative( side ) );
             }
 
-            if( tile instanceof SignTileEntity ) setSignText( world, tile, (String) extraArguments[0] );
+            if( tile instanceof SignBlockEntity ) setSignText( world, tile, message );
         }
 
         return placed;
@@ -265,47 +262,47 @@ public class TurtlePlaceCommand implements ITurtleCommand
      * @param context      The context of this place action.
      * @param hit          Where the block we're placing against was clicked.
      * @return If this item was deployed.
-     * @see net.minecraft.server.management.PlayerInteractionManager#useItemOn For the original implementation.
+     * @see net.minecraft.server.level.ServerPlayerGameMode#useItemOn  For the original implementation.
      */
-    private static ActionResultType doDeployOnBlock(
-        @Nonnull ItemStack stack, TurtlePlayer turtlePlayer, BlockPos position, ItemUseContext context, BlockRayTraceResult hit
+    private static InteractionResult doDeployOnBlock(
+        @Nonnull ItemStack stack, TurtlePlayer turtlePlayer, BlockPos position, UseOnContext context, BlockHitResult hit
     )
     {
-        PlayerInteractEvent.RightClickBlock event = ForgeHooks.onRightClickBlock( turtlePlayer, Hand.MAIN_HAND, position, hit );
+        PlayerInteractEvent.RightClickBlock event = ForgeHooks.onRightClickBlock( turtlePlayer, InteractionHand.MAIN_HAND, position, hit );
         if( event.isCanceled() ) return event.getCancellationResult();
 
         if( event.getUseItem() != Result.DENY )
         {
-            ActionResultType result = stack.onItemUseFirst( context );
-            if( result != ActionResultType.PASS ) return result;
+            InteractionResult result = stack.onItemUseFirst( context );
+            if( result != InteractionResult.PASS ) return result;
         }
 
         if( event.getUseItem() != Result.DENY )
         {
-            ActionResultType result = stack.useOn( context );
-            if( result != ActionResultType.PASS ) return result;
+            InteractionResult result = stack.useOn( context );
+            if( result != InteractionResult.PASS ) return result;
         }
 
         Item item = stack.getItem();
-        if( item instanceof BucketItem || item instanceof BoatItem || item instanceof LilyPadItem || item instanceof GlassBottleItem )
+        if( item instanceof BucketItem || item instanceof BoatItem || item instanceof WaterLilyBlockItem || item instanceof BottleItem )
         {
-            ActionResultType actionResult = ForgeHooks.onItemRightClick( turtlePlayer, Hand.MAIN_HAND );
-            if( actionResult != null && actionResult != ActionResultType.PASS ) return actionResult;
+            InteractionResult actionResult = ForgeHooks.onItemRightClick( turtlePlayer, InteractionHand.MAIN_HAND );
+            if( actionResult != null && actionResult != InteractionResult.PASS ) return actionResult;
 
-            ActionResult<ItemStack> result = stack.use( context.getLevel(), turtlePlayer, Hand.MAIN_HAND );
+            InteractionResultHolder<ItemStack> result = stack.use( context.getLevel(), turtlePlayer, InteractionHand.MAIN_HAND );
             if( result.getResult().consumesAction() && !ItemStack.matches( stack, result.getObject() ) )
             {
-                turtlePlayer.setItemInHand( Hand.MAIN_HAND, result.getObject() );
+                turtlePlayer.setItemInHand( InteractionHand.MAIN_HAND, result.getObject() );
                 return result.getResult();
             }
         }
 
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
-    private static void setSignText( World world, TileEntity tile, String message )
+    private static void setSignText( Level world, BlockEntity tile, String message )
     {
-        SignTileEntity signTile = (SignTileEntity) tile;
+        SignBlockEntity signTile = (SignBlockEntity) tile;
         String[] split = message.split( "\n" );
         int firstLine = split.length <= 2 ? 1 : 0;
         for( int i = 0; i < 4; i++ )
@@ -314,17 +311,17 @@ public class TurtlePlaceCommand implements ITurtleCommand
             {
                 String line = split[i - firstLine];
                 signTile.setMessage( i, line.length() > 15
-                    ? new StringTextComponent( line.substring( 0, 15 ) )
-                    : new StringTextComponent( line )
+                    ? new TextComponent( line.substring( 0, 15 ) )
+                    : new TextComponent( line )
                 );
             }
             else
             {
-                signTile.setMessage( i, new StringTextComponent( "" ) );
+                signTile.setMessage( i, new TextComponent( "" ) );
             }
         }
         signTile.setChanged();
-        world.sendBlockUpdated( tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), 3 );
+        world.sendBlockUpdated( tile.getBlockPos(), tile.getBlockState(), tile.getBlockState(), Constants.BlockFlags.DEFAULT );
     }
 
     private static class ErrorMessage

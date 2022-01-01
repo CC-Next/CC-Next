@@ -6,9 +6,10 @@
 package dan200.computercraft.shared.peripheral.generic.methods;
 
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.api.lua.GenericSource;
 import dan200.computercraft.api.lua.LuaFunction;
-import net.minecraft.util.ResourceLocation;
+import dan200.computercraft.api.peripheral.GenericPeripheral;
+import dan200.computercraft.api.peripheral.PeripheralType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -18,15 +19,22 @@ import javax.annotation.Nonnull;
  *
  * This works with energy storage blocks, as well as generators and machines which consume energy.
  *
- * <blockquote>
- * <strong>Note:</strong> Due to limitations with Forge's energy API, it is not possible to measure throughput (i.e. RF
+ * :::note
+ * Due to limitations with Forge's energy API, it is not possible to measure throughput (i.e. RF
  * used/generated per tick).
- * </blockquote>
+ * :::
  *
  * @cc.module energy_storage
  */
-public class EnergyMethods implements GenericSource
+public class EnergyMethods implements GenericPeripheral
 {
+    @Nonnull
+    @Override
+    public PeripheralType getType()
+    {
+        return PeripheralType.ofAdditional( "energy_storage" );
+    }
+
     @Nonnull
     @Override
     public ResourceLocation id()

@@ -20,8 +20,8 @@ import dan200.computercraft.core.filesystem.FileSystemException;
 import dan200.computercraft.core.terminal.Terminal;
 import dan200.computercraft.shared.peripheral.modem.ModemState;
 import dan200.computercraft.shared.peripheral.modem.wireless.WirelessModemPeripheral;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.*;
@@ -97,7 +97,7 @@ public class ComputerTestDelegate
 
         if( REPORT_PATH.delete() ) ComputerCraft.log.info( "Deleted previous coverage report." );
 
-        Terminal term = new Terminal( 78, 20 );
+        Terminal term = new Terminal( 80, 100 );
         IWritableMount mount = new FileMount( new File( "test-files/mount" ), 10_000_000 );
 
         // Remove any existing files
@@ -289,16 +289,16 @@ public class ComputerTestDelegate
         @Nonnull
         @Override
         @SuppressWarnings( "ConstantConditions" )
-        public World getWorld()
+        public Level getLevel()
         {
             return null;
         }
 
         @Nonnull
         @Override
-        public Vector3d getPosition()
+        public Vec3 getPosition()
         {
-            return Vector3d.ZERO;
+            return Vec3.ZERO;
         }
 
         @Override
@@ -340,9 +340,8 @@ public class ComputerTestDelegate
             DynamicNodeBuilder root = new DynamicNodeBuilder( "" );
             for( Object key : tests.keySet() )
             {
-                if( !(key instanceof String) ) throw new LuaException( "Non-key string " + getType( key ) );
+                if( !(key instanceof String name) ) throw new LuaException( "Non-key string " + getType( key ) );
 
-                String name = (String) key;
                 String[] parts = name.split( "\0" );
                 DynamicNodeBuilder builder = root;
                 for( int i = 0; i < parts.length - 1; i++ ) builder = builder.get( parts[i] );

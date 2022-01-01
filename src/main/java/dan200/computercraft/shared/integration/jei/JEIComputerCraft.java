@@ -28,10 +28,10 @@ import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.registration.IAdvancedRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -76,27 +76,30 @@ public class JEIComputerCraft implements IModPlugin
         List<ItemStack> upgradeItems = new ArrayList<>();
         for( ComputerFamily family : MAIN_FAMILIES )
         {
-            TurtleUpgrades.getUpgrades()
-                .filter( x -> TurtleUpgrades.suitableForFamily( family, x ) )
-                .map( x -> TurtleItemFactory.create( -1, null, -1, family, null, x, 0, null ) )
-                .forEach( upgradeItems::add );
+            for( ITurtleUpgrade upgrade : TurtleUpgrades.instance().getUpgrades() )
+            {
+                upgradeItems.add( TurtleItemFactory.create( -1, null, -1, family, null, upgrade, 0, null ) );
+            }
 
-            for( IPocketUpgrade upgrade : PocketUpgrades.getUpgrades() )
+            for( IPocketUpgrade upgrade : PocketUpgrades.instance().getUpgrades() )
             {
                 upgradeItems.add( PocketComputerItemFactory.create( -1, null, -1, family, upgrade ) );
             }
         }
 
-        runtime.getIngredientManager().addIngredientsAtRuntime( VanillaTypes.ITEM, upgradeItems );
+        if( !upgradeItems.isEmpty() )
+        {
+            runtime.getIngredientManager().addIngredientsAtRuntime( VanillaTypes.ITEM, upgradeItems );
+        }
 
         // Hide all upgrade recipes
-        IRecipeCategory<?> category = registry.getRecipeCategory( VanillaRecipeCategoryUid.CRAFTING );
+        IRecipeCategory<?> category = registry.getRecipeCategory( VanillaRecipeCategoryUid.CRAFTING, false );
         if( category != null )
         {
-            for( Object wrapper : registry.getRecipes( category ) )
+            for( Object wrapper : registry.getRecipes( category, null, false ) )
             {
-                if( !(wrapper instanceof IRecipe) ) continue;
-                ResourceLocation id = ((IRecipe<?>) wrapper).getId();
+                if( !(wrapper instanceof Recipe) ) continue;
+                ResourceLocation id = ((Recipe<?>) wrapper).getId();
                 if( !id.getNamespace().equals( ComputerCraft.MOD_ID ) ) continue;
 
                 String path = id.getPath();
@@ -114,9 +117,8 @@ public class JEIComputerCraft implements IModPlugin
      */
     private static final IIngredientSubtypeInterpreter<ItemStack> turtleSubtype = ( stack, ctx ) -> {
         Item item = stack.getItem();
-        if( !(item instanceof ITurtleItem) ) return IIngredientSubtypeInterpreter.NONE;
+        if( !(item instanceof ITurtleItem turtle) ) return IIngredientSubtypeInterpreter.NONE;
 
-        ITurtleItem turtle = (ITurtleItem) item;
         StringBuilder name = new StringBuilder( "turtle:" );
 
         // Add left and right upgrades to the identifier
@@ -150,9 +152,7 @@ public class JEIComputerCraft implements IModPlugin
      */
     private static final IIngredientSubtypeInterpreter<ItemStack> diskSubtype = ( stack, ctx ) -> {
         Item item = stack.getItem();
-        if( !(item instanceof ItemDisk) ) return IIngredientSubtypeInterpreter.NONE;
-
-        ItemDisk disk = (ItemDisk) item;
+        if( !(item instanceof ItemDisk disk) ) return IIngredientSubtypeInterpreter.NONE;
 
         int colour = disk.getColour( stack );
         return colour == -1 ? IIngredientSubtypeInterpreter.NONE : String.format( "%06x", colour );

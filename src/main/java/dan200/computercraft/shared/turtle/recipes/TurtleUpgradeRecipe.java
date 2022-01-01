@@ -11,17 +11,17 @@ import dan200.computercraft.shared.TurtleUpgrades;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.turtle.items.ITurtleItem;
 import dan200.computercraft.shared.turtle.items.TurtleItemFactory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public final class TurtleUpgradeRecipe extends SpecialRecipe
+public final class TurtleUpgradeRecipe extends CustomRecipe
 {
     private TurtleUpgradeRecipe( ResourceLocation id )
     {
@@ -42,14 +42,14 @@ public final class TurtleUpgradeRecipe extends SpecialRecipe
     }
 
     @Override
-    public boolean matches( @Nonnull CraftingInventory inventory, @Nonnull World world )
+    public boolean matches( @Nonnull CraftingContainer inventory, @Nonnull Level world )
     {
         return !assemble( inventory ).isEmpty();
     }
 
     @Nonnull
     @Override
-    public ItemStack assemble( @Nonnull CraftingInventory inventory )
+    public ItemStack assemble( @Nonnull CraftingContainer inventory )
     {
         // Scan the grid for a row containing a turtle and 1 or 2 items
         ItemStack leftItem = ItemStack.EMPTY;
@@ -152,19 +152,8 @@ public final class TurtleUpgradeRecipe extends SpecialRecipe
         {
             if( !items[i].isEmpty() )
             {
-                ITurtleUpgrade itemUpgrade = TurtleUpgrades.get( items[i] );
-                if( itemUpgrade == null )
-                {
-                    return ItemStack.EMPTY;
-                }
-                if( upgrades[i] != null )
-                {
-                    return ItemStack.EMPTY;
-                }
-                if( !TurtleUpgrades.suitableForFamily( family, itemUpgrade ) )
-                {
-                    return ItemStack.EMPTY;
-                }
+                ITurtleUpgrade itemUpgrade = TurtleUpgrades.instance().get( items[i] );
+                if( itemUpgrade == null || upgrades[i] != null ) return ItemStack.EMPTY;
                 upgrades[i] = itemUpgrade;
             }
         }
@@ -180,10 +169,10 @@ public final class TurtleUpgradeRecipe extends SpecialRecipe
 
     @Nonnull
     @Override
-    public IRecipeSerializer<?> getSerializer()
+    public RecipeSerializer<?> getSerializer()
     {
         return SERIALIZER;
     }
 
-    public static final IRecipeSerializer<TurtleUpgradeRecipe> SERIALIZER = new SpecialRecipeSerializer<>( TurtleUpgradeRecipe::new );
+    public static final SimpleRecipeSerializer<TurtleUpgradeRecipe> SERIALIZER = new SimpleRecipeSerializer<>( TurtleUpgradeRecipe::new );
 }

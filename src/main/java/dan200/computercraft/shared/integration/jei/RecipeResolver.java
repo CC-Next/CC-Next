@@ -6,7 +6,7 @@
 package dan200.computercraft.shared.integration.jei;
 
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.api.IUpgradeBase;
+import dan200.computercraft.api.upgrades.IUpgradeBase;
 import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.api.turtle.TurtleSide;
@@ -21,19 +21,19 @@ import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.advanced.IRecipeManagerPlugin;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import javax.annotation.Nonnull;
 import java.util.*;
 
-import static net.minecraft.item.crafting.Ingredient.of;
-import static net.minecraft.util.NonNullList.of;
+import static net.minecraft.core.NonNullList.of;
+import static net.minecraft.world.item.crafting.Ingredient.of;
 
 class RecipeResolver implements IRecipeManagerPlugin
 {
@@ -52,16 +52,17 @@ class RecipeResolver implements IRecipeManagerPlugin
         if( initialised ) return;
         initialised = true;
 
-        TurtleUpgrades.getUpgrades().forEach( upgrade -> {
+        for( ITurtleUpgrade upgrade : TurtleUpgrades.instance().getUpgrades() )
+        {
             ItemStack stack = upgrade.getCraftingItem();
             if( stack.isEmpty() ) return;
 
             UpgradeInfo info = new UpgradeInfo( stack, upgrade );
             upgradeItemLookup.computeIfAbsent( stack.getItem(), k -> new ArrayList<>( 1 ) ).add( info );
             turtleUpgrades.add( info );
-        } );
+        };
 
-        for( IPocketUpgrade upgrade : PocketUpgrades.getUpgrades() )
+        for( IPocketUpgrade upgrade : PocketUpgrades.instance().getUpgrades() )
         {
             ItemStack stack = upgrade.getCraftingItem();
             if( stack.isEmpty() ) continue;
@@ -97,9 +98,8 @@ class RecipeResolver implements IRecipeManagerPlugin
     public <V> List<ResourceLocation> getRecipeCategoryUids( @Nonnull IFocus<V> focus )
     {
         V value = focus.getValue();
-        if( !(value instanceof ItemStack) ) return Collections.emptyList();
+        if( !(value instanceof ItemStack stack) ) return Collections.emptyList();
 
-        ItemStack stack = (ItemStack) value;
         switch( focus.getMode() )
         {
             case INPUT:
@@ -120,12 +120,11 @@ class RecipeResolver implements IRecipeManagerPlugin
     @Override
     public <T, V> List<T> getRecipes( @Nonnull IRecipeCategory<T> recipeCategory, @Nonnull IFocus<V> focus )
     {
-        if( !(focus.getValue() instanceof ItemStack) || !recipeCategory.getUid().equals( VanillaRecipeCategoryUid.CRAFTING ) )
+        if( !(focus.getValue() instanceof ItemStack stack) || !recipeCategory.getUid().equals( VanillaRecipeCategoryUid.CRAFTING ) )
         {
             return Collections.emptyList();
         }
 
-        ItemStack stack = (ItemStack) focus.getValue();
         switch( focus.getMode() )
         {
             case INPUT:
@@ -149,10 +148,9 @@ class RecipeResolver implements IRecipeManagerPlugin
     {
         setupCache();
 
-        if( stack.getItem() instanceof ITurtleItem )
+        if( stack.getItem() instanceof ITurtleItem item )
         {
             // Suggest possible upgrades which can be applied to this turtle
-            ITurtleItem item = (ITurtleItem) stack.getItem();
             ITurtleUpgrade left = item.getUpgrade( stack, TurtleSide.LEFT );
             ITurtleUpgrade right = item.getUpgrade( stack, TurtleSide.RIGHT );
             if( left != null && right != null ) return Collections.emptyList();
@@ -228,9 +226,8 @@ class RecipeResolver implements IRecipeManagerPlugin
     private static List<Shaped> findRecipesWithOutput( @Nonnull ItemStack stack )
     {
         // Find which upgrade this item currently has, an so how we could build it.
-        if( stack.getItem() instanceof ITurtleItem )
+        if( stack.getItem() instanceof ITurtleItem item )
         {
-            ITurtleItem item = (ITurtleItem) stack.getItem();
             List<Shaped> recipes = new ArrayList<>( 0 );
 
             ITurtleUpgrade left = item.getUpgrade( stack, TurtleSide.LEFT );
@@ -321,7 +318,7 @@ class RecipeResolver implements IRecipeManagerPlugin
 
         @Nonnull
         @Override
-        public IRecipeSerializer<?> getSerializer()
+        public RecipeSerializer<?> getSerializer()
         {
             throw new IllegalStateException( "Should not serialise the JEI recipe" );
         }
@@ -360,7 +357,7 @@ class RecipeResolver implements IRecipeManagerPlugin
             recipes = this.recipes = new ArrayList<>( 4 );
             for( ComputerFamily family : MAIN_FAMILIES )
             {
-                if( turtle != null && TurtleUpgrades.suitableForFamily( family, turtle ) )
+                if( turtle != null )
                 {
                     recipes.add( horizontal(
                         of( Ingredient.EMPTY, ingredient, of( TurtleItemFactory.create( -1, null, -1, family, null, null, 0, null ) ) ),

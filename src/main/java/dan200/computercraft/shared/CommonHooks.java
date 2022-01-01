@@ -8,30 +8,31 @@ package dan200.computercraft.shared;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.core.apis.http.NetworkUtils;
 import dan200.computercraft.core.computer.MainThread;
+import dan200.computercraft.core.filesystem.ResourceMount;
 import dan200.computercraft.core.tracking.ComputerMBean;
 import dan200.computercraft.core.tracking.Tracking;
 import dan200.computercraft.shared.command.CommandComputerCraft;
 import dan200.computercraft.shared.computer.core.IComputer;
 import dan200.computercraft.shared.computer.core.IContainerComputer;
 import dan200.computercraft.shared.computer.core.ServerComputer;
+import dan200.computercraft.shared.network.NetworkHandler;
+import dan200.computercraft.shared.network.client.UpgradesLoadedMessage;
 import dan200.computercraft.shared.peripheral.modem.wireless.WirelessNetwork;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.loot.ConstantRange;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTables;
-import net.minecraft.loot.TableLootEntry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootTableReference;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,7 +66,7 @@ public final class CommonHooks
     public static void onContainerOpen( PlayerContainerEvent.Open event )
     {
         // If we're opening a computer container then broadcast the terminal state
-        Container container = event.getContainer();
+        AbstractContainerMenu container = event.getContainer();
         if( container instanceof IContainerComputer )
         {
             IComputer computer = ((IContainerComputer) container).getComputer();
@@ -86,7 +87,7 @@ public final class CommonHooks
     public static void onServerStarting( FMLServerStartingEvent event )
     {
         MinecraftServer server = event.getServer();
-        if( server instanceof DedicatedServer && ((DedicatedServer) server).getProperties().enableJmxMonitoring )
+        if( server instanceof DedicatedServer dediServer && dediServer.getProperties().enableJmxMonitoring )
         {
             ComputerMBean.register();
         }
@@ -114,16 +115,16 @@ public final class CommonHooks
     public static final ResourceLocation LOOT_TREASURE_DISK = new ResourceLocation( ComputerCraft.MOD_ID, "treasure_disk" );
 
     private static final Set<ResourceLocation> TABLES = new HashSet<>( Arrays.asList(
-        LootTables.SIMPLE_DUNGEON,
-        LootTables.ABANDONED_MINESHAFT,
-        LootTables.STRONGHOLD_CORRIDOR,
-        LootTables.STRONGHOLD_CROSSING,
-        LootTables.STRONGHOLD_LIBRARY,
-        LootTables.DESERT_PYRAMID,
-        LootTables.JUNGLE_TEMPLE,
-        LootTables.IGLOO_CHEST,
-        LootTables.WOODLAND_MANSION,
-        LootTables.VILLAGE_CARTOGRAPHER
+        BuiltInLootTables.SIMPLE_DUNGEON,
+        BuiltInLootTables.ABANDONED_MINESHAFT,
+        BuiltInLootTables.STRONGHOLD_CORRIDOR,
+        BuiltInLootTables.STRONGHOLD_CROSSING,
+        BuiltInLootTables.STRONGHOLD_LIBRARY,
+        BuiltInLootTables.DESERT_PYRAMID,
+        BuiltInLootTables.JUNGLE_TEMPLE,
+        BuiltInLootTables.IGLOO_CHEST,
+        BuiltInLootTables.WOODLAND_MANSION,
+        BuiltInLootTables.VILLAGE_CARTOGRAPHER
     ) );
 
     @SubscribeEvent
@@ -133,9 +134,31 @@ public final class CommonHooks
         if( !name.getNamespace().equals( "minecraft" ) || !TABLES.contains( name ) ) return;
 
         event.getTable().addPool( LootPool.lootPool()
-            .add( TableLootEntry.lootTableReference( LOOT_TREASURE_DISK ) )
-            .setRolls( ConstantRange.exactly( 1 ) )
+            .add( LootTableReference.lootTableReference( LOOT_TREASURE_DISK ) )
+            .setRolls( ConstantValue.exactly( 1 ) )
             .name( "computercraft_treasure" )
             .build() );
+    }
+
+    @SubscribeEvent
+    public static void onAddReloadListeners( AddReloadListenerEvent event )
+    {
+        event.addListener( ResourceMount.RELOAD_LISTENER );
+        event.addListener( TurtleUpgrades.instance() );
+        event.addListener( PocketUpgrades.instance() );
+    }
+
+    @SubscribeEvent
+    public static void onDatapackSync( OnDatapackSyncEvent event )
+    {
+        var packet = new UpgradesLoadedMessage();
+        if( event.getPlayer() == null )
+        {
+            NetworkHandler.sendToAllPlayers( packet );
+        }
+        else
+        {
+            NetworkHandler.sendToPlayer( event.getPlayer(), packet );
+        }
     }
 }

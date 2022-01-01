@@ -5,13 +5,14 @@
  */
 package dan200.computercraft.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.media.items.ItemPrintout;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderItemInFrameEvent;
@@ -50,13 +51,13 @@ public final class ItemPrintoutRenderer extends ItemMapLikeRenderer
     }
 
     @Override
-    protected void renderItem( MatrixStack transform, IRenderTypeBuffer render, ItemStack stack )
+    protected void renderItem( PoseStack transform, MultiBufferSource render, ItemStack stack, int light )
     {
         transform.mulPose( Vector3f.XP.rotationDegrees( 180f ) );
         transform.scale( 0.42f, 0.42f, -0.42f );
         transform.translate( -0.5f, -0.48f, 0.0f );
 
-        drawPrintout( transform, render, stack );
+        drawPrintout( transform, render, stack, light );
     }
 
     @SubscribeEvent
@@ -66,7 +67,7 @@ public final class ItemPrintoutRenderer extends ItemMapLikeRenderer
         if( !(stack.getItem() instanceof ItemPrintout) ) return;
         event.setCanceled( true );
 
-        MatrixStack transform = event.getMatrix();
+        PoseStack transform = event.getMatrix();
 
         // Move a little bit forward to ensure we're not clipping with the frame
         transform.translate( 0.0f, 0.0f, -0.001f );
@@ -74,10 +75,11 @@ public final class ItemPrintoutRenderer extends ItemMapLikeRenderer
         transform.scale( 0.95f, 0.95f, -0.95f );
         transform.translate( -0.5f, -0.5f, 0.0f );
 
-        drawPrintout( transform, event.getBuffers(), stack );
+        int light = event.getEntityItemFrame().getType() == EntityType.GLOW_ITEM_FRAME ? 0xf000d2 : event.getLight(); // See getLightVal.
+        drawPrintout( transform, event.getBuffers(), stack, light );
     }
 
-    private static void drawPrintout( MatrixStack transform, IRenderTypeBuffer render, ItemStack stack )
+    private static void drawPrintout( PoseStack transform, MultiBufferSource render, ItemStack stack, int light )
     {
         int pages = ItemPrintout.getPageCount( stack );
         boolean book = ((ItemPrintout) stack.getItem()).getType() == ItemPrintout.Type.BOOK;
@@ -105,9 +107,10 @@ public final class ItemPrintoutRenderer extends ItemMapLikeRenderer
         transform.translate( (max - width) / 2.0, (max - height) / 2.0, 0.0 );
 
         Matrix4f matrix = transform.last().pose();
-        drawBorder( matrix, render, 0, 0, -0.01f, 0, pages, book );
-        drawText( matrix, render,
-            X_TEXT_MARGIN, Y_TEXT_MARGIN, 0, ItemPrintout.getText( stack ), ItemPrintout.getColours( stack )
+        drawBorder( matrix, render, 0, 0, -0.01f, 0, pages, book, light );
+        drawText(
+            matrix, render, X_TEXT_MARGIN, Y_TEXT_MARGIN, 0, light,
+            ItemPrintout.getText( stack ), ItemPrintout.getColours( stack )
         );
     }
 }

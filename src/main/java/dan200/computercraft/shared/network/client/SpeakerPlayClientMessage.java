@@ -5,16 +5,14 @@
  */
 package dan200.computercraft.shared.network.client;
 
-import dan200.computercraft.client.SoundManager;
+import dan200.computercraft.client.sound.SpeakerManager;
 import dan200.computercraft.shared.network.NetworkMessage;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -29,12 +27,12 @@ import java.util.UUID;
 public class SpeakerPlayClientMessage implements NetworkMessage
 {
     private final UUID source;
-    private final Vector3d pos;
+    private final Vec3 pos;
     private final ResourceLocation sound;
     private final float volume;
     private final float pitch;
 
-    public SpeakerPlayClientMessage( UUID source, Vector3d pos, ResourceLocation event, float volume, float pitch )
+    public SpeakerPlayClientMessage( UUID source, Vec3 pos, ResourceLocation event, float volume, float pitch )
     {
         this.source = source;
         this.pos = pos;
@@ -43,17 +41,17 @@ public class SpeakerPlayClientMessage implements NetworkMessage
         this.pitch = pitch;
     }
 
-    public SpeakerPlayClientMessage( PacketBuffer buf )
+    public SpeakerPlayClientMessage( FriendlyByteBuf buf )
     {
         source = buf.readUUID();
-        pos = new Vector3d( buf.readDouble(), buf.readDouble(), buf.readDouble() );
+        pos = new Vec3( buf.readDouble(), buf.readDouble(), buf.readDouble() );
         sound = buf.readResourceLocation();
         volume = buf.readFloat();
         pitch = buf.readFloat();
     }
 
     @Override
-    public void toBytes( @Nonnull PacketBuffer buf )
+    public void toBytes( @Nonnull FriendlyByteBuf buf )
     {
         buf.writeUUID( source );
         buf.writeDouble( pos.x() );
@@ -68,7 +66,6 @@ public class SpeakerPlayClientMessage implements NetworkMessage
     @OnlyIn( Dist.CLIENT )
     public void handle( NetworkEvent.Context context )
     {
-        SoundEvent sound = ForgeRegistries.SOUND_EVENTS.getValue( this.sound );
-        if( sound != null ) SoundManager.playSound( source, pos, sound, volume, pitch );
+        SpeakerManager.getSound( source ).playSound( pos, sound, volume, pitch );
     }
 }

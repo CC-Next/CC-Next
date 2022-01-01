@@ -9,11 +9,11 @@ license="ComputerCraft Public License (https://raw.githubusercontent.com/dan200/
 [[mods]]
 modId="computercraft"
 version="${file.jarVersion}"
+displayName="CC: Next"
 displayURL="https://github.com/CC-Next/CC-Next"
 
 credits="Created by Daniel Ratcliffe (@DanTwoHundred)"
 authors="Daniel Ratcliffe, Aaron Mills, SquidDev"
-displayName="CC: Next"
 description='''
 Bleeding edge CC:T builds. Expect bugs.
 '''

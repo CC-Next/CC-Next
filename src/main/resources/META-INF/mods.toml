@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="[37,38)"
 
-issueTrackerURL="https://github.com/cc-tweaked/CC-Tweaked/issues"
+issueTrackerURL="https://github.com/CC-Next/CC-Next/issues"
 logoFile="pack.png"
 
 license="ComputerCraft Public License (https://raw.githubusercontent.com/dan200/ComputerCraft/master/LICENSE)"
@@ -9,13 +9,13 @@ license="ComputerCraft Public License (https://raw.githubusercontent.com/dan200/
 [[mods]]
 modId="computercraft"
 version="${file.jarVersion}"
-displayName="CC: Tweaked"
-displayURL="https://tweaked.cc"
+displayName="CC: Next"
+displayURL="https://github.com/CC-Next/CC-Next"
 
 credits="Created by Daniel Ratcliffe (@DanTwoHundred)"
 authors="Daniel Ratcliffe, Aaron Mills, SquidDev"
 description='''
-CC: Tweaked is a fork of ComputerCraft, adding programmable computers, turtles and more to Minecraft.
+Bleeding edge CC:T builds. Expect bugs.
 '''
 
 [[dependencies.computercraft]]

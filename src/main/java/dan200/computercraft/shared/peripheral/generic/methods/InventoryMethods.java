@@ -6,15 +6,18 @@
 package dan200.computercraft.shared.peripheral.generic.methods;
 
 import dan200.computercraft.ComputerCraft;
-import dan200.computercraft.api.lua.GenericSource;
+import dan200.computercraft.api.lua.ILuaContext;
 import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
+import dan200.computercraft.api.peripheral.GenericPeripheral;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.peripheral.PeripheralType;
 import dan200.computercraft.shared.peripheral.generic.data.ItemData;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -35,8 +38,15 @@ import static dan200.computercraft.shared.peripheral.generic.methods.ArgumentHel
  *
  * @cc.module inventory
  */
-public class InventoryMethods implements GenericSource
+public class InventoryMethods implements GenericPeripheral
 {
+    @Nonnull
+    @Override
+    public PeripheralType getType()
+    {
+        return PeripheralType.ofAdditional( "inventory" );
+    }
+
     @Nonnull
     @Override
     public ResourceLocation id()
@@ -60,9 +70,10 @@ public class InventoryMethods implements GenericSource
      * List all items in this inventory. This returns a table, with an entry for each slot.
      *
      * Each item in the inventory is represented by a table containing some basic information, much like
-     * {@link dan200.computercraft.shared.turtle.apis.TurtleAPI#getItemDetail} includes. More information can be fetched
-     * with {@link #getItemDetail}. The table contains the item `name`, the `count` and an a (potentially nil) hash of
-     * the item's `nbt.` This NBT data doesn't contain anything useful, but allows you to distinguish identical items.
+     * {@link dan200.computercraft.shared.turtle.apis.TurtleAPI#getItemDetail(ILuaContext, Optional, Optional)}
+     * includes. More information can be fetched with {@link #getItemDetail}. The table contains the item `name`, the
+     * `count` and an a (potentially nil) hash of the item's `nbt.` This NBT data doesn't contain anything useful, but
+     * allows you to distinguish identical items.
      *
      * The returned table is sparse, and so empty slots will be `nil` - it is recommended to loop over using `pairs`
      * rather than `ipairs`.
@@ -257,14 +268,16 @@ public class InventoryMethods implements GenericSource
     @Nullable
     private static IItemHandler extractHandler( @Nullable Object object )
     {
-        if( object instanceof ICapabilityProvider )
+        if( object instanceof BlockEntity blockEntity && blockEntity.isRemoved() ) return null;
+
+        if( object instanceof ICapabilityProvider provider )
         {
-            LazyOptional<IItemHandler> cap = ((ICapabilityProvider) object).getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY );
+            LazyOptional<IItemHandler> cap = provider.getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY );
             if( cap.isPresent() ) return cap.orElseThrow( NullPointerException::new );
         }
 
-        if( object instanceof IItemHandler ) return (IItemHandler) object;
-        if( object instanceof IInventory ) return new InvWrapper( (IInventory) object );
+        if( object instanceof IItemHandler handler ) return handler;
+        if( object instanceof Container container ) return new InvWrapper( container );
         return null;
     }
 

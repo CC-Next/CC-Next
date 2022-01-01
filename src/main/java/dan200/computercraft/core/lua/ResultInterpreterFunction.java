@@ -24,7 +24,7 @@ class ResultInterpreterFunction extends ResumableVarArgFunction<ResultInterprete
     static class Container
     {
         ILuaCallback callback;
-        int errorAdjust;
+        final int errorAdjust;
 
         Container( ILuaCallback callback, int errorAdjust )
         {
@@ -68,6 +68,10 @@ class ResultInterpreterFunction extends ResumableVarArgFunction<ResultInterprete
                 ComputerCraft.log.error( "Error calling " + name + " on " + instance, t );
             }
             throw new LuaError( "Java Exception Thrown: " + t, 0 );
+        }
+        finally
+        {
+            arguments.releaseImmediate();
         }
 
         ILuaCallback callback = results.getCallback();

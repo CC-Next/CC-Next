@@ -8,17 +8,19 @@ package dan200.computercraft.shared.computer.blocks;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.core.computer.ComputerSide;
+import dan200.computercraft.shared.Registry;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ComputerState;
 import dan200.computercraft.shared.computer.core.ServerComputer;
-import dan200.computercraft.shared.computer.inventory.ContainerComputer;
+import dan200.computercraft.shared.computer.inventory.ComputerMenuWithoutInventory;
 import dan200.computercraft.shared.util.CapabilityUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -32,9 +34,9 @@ public class TileComputer extends TileComputerBase
     private ComputerProxy proxy;
     private LazyOptional<IPeripheral> peripheral;
 
-    public TileComputer( ComputerFamily family, TileEntityType<? extends TileComputer> type )
+    public TileComputer( BlockEntityType<? extends TileComputer> type, BlockPos pos, BlockState state, ComputerFamily family )
     {
-        super( type, family );
+        super( type, pos, state, family );
     }
 
     @Override
@@ -50,7 +52,7 @@ public class TileComputer extends TileComputerBase
         return computer;
     }
 
-    public boolean isUsableByPlayer( PlayerEntity player )
+    protected boolean isUsableByPlayer( Player player )
     {
         return isUsable( player, false );
     }
@@ -83,9 +85,9 @@ public class TileComputer extends TileComputerBase
 
     @Nullable
     @Override
-    public Container createMenu( int id, @Nonnull PlayerInventory inventory, @Nonnull PlayerEntity player )
+    public AbstractContainerMenu createMenu( int id, @Nonnull Inventory inventory, @Nonnull Player player )
     {
-        return new ContainerComputer( id, this );
+        return new ComputerMenuWithoutInventory( Registry.ModContainers.COMPUTER.get(), id, inventory, this::isUsableByPlayer, createServerComputer(), getFamily() );
     }
 
     @Nonnull
@@ -108,7 +110,7 @@ public class TileComputer extends TileComputerBase
     }
 
     @Override
-    protected void invalidateCaps()
+    public void invalidateCaps()
     {
         super.invalidateCaps();
         peripheral = CapabilityUtil.invalidate( peripheral );

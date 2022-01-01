@@ -63,8 +63,8 @@ public class WirelessNetwork implements IPacketNetwork
 
     private static void tryTransmit( IPacketReceiver receiver, Packet packet, double range, boolean interdimensional )
     {
-        IPacketSender sender = packet.getSender();
-        if( receiver.getWorld() == sender.getWorld() )
+        IPacketSender sender = packet.sender();
+        if( receiver.getLevel() == sender.getLevel() )
         {
             double receiveRange = Math.max( range, receiver.getRange() ); // Ensure range is symmetrical
             double distanceSq = receiver.getPosition().distanceToSqr( sender.getPosition() );

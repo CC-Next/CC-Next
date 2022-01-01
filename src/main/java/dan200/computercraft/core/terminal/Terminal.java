@@ -7,8 +7,8 @@ package dan200.computercraft.core.terminal;
 
 import dan200.computercraft.shared.util.Colour;
 import dan200.computercraft.shared.util.Palette;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 import javax.annotation.Nonnull;
 
@@ -310,7 +310,7 @@ public class Terminal
         if( onChanged != null ) onChanged.run();
     }
 
-    public synchronized void write( PacketBuffer buffer )
+    public synchronized void write( FriendlyByteBuf buffer )
     {
         buffer.writeInt( cursorX );
         buffer.writeInt( cursorY );
@@ -336,7 +336,7 @@ public class Terminal
         palette.write( buffer );
     }
 
-    public synchronized void read( PacketBuffer buffer )
+    public synchronized void read( FriendlyByteBuf buffer )
     {
         cursorX = buffer.readInt();
         cursorY = buffer.readInt();
@@ -366,7 +366,7 @@ public class Terminal
         setChanged();
     }
 
-    public synchronized CompoundNBT writeToNBT( CompoundNBT nbt )
+    public synchronized CompoundTag writeToNBT( CompoundTag nbt )
     {
         nbt.putInt( "term_cursorX", cursorX );
         nbt.putInt( "term_cursorY", cursorY );
@@ -384,7 +384,7 @@ public class Terminal
         return nbt;
     }
 
-    public synchronized void readFromNBT( CompoundNBT nbt )
+    public synchronized void readFromNBT( CompoundTag nbt )
     {
         cursorX = nbt.getInt( "term_cursorX" );
         cursorY = nbt.getInt( "term_cursorY" );
@@ -419,6 +419,7 @@ public class Terminal
     {
         if( c >= '0' && c <= '9' ) return c - '0';
         if( c >= 'a' && c <= 'f' ) return c - 'a' + 10;
+        if( c >= 'A' && c <= 'F' ) return c - 'A' + 10;
         return 15 - def.ordinal();
     }
 }

@@ -8,10 +8,11 @@ package dan200.computercraft.shared.util;
 import com.google.common.collect.MapMaker;
 import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.common.TileGeneric;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -21,7 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A thread-safe version of {@link ITickList#scheduleTick(BlockPos, Object, int)}.
+ * A thread-safe version of {@link LevelAccessor#scheduleTick(BlockPos, Block, int)}.
  *
  * We use this when modems and other peripherals change a block in a different thread.
  */
@@ -32,7 +33,7 @@ public final class TickScheduler
     {
     }
 
-    private static final Set<TileEntity> toTick = Collections.newSetFromMap(
+    private static final Set<BlockEntity> toTick = Collections.newSetFromMap(
         new MapMaker()
             .weakKeys()
             .makeMap()
@@ -40,7 +41,7 @@ public final class TickScheduler
 
     public static void schedule( TileGeneric tile )
     {
-        World world = tile.getLevel();
+        Level world = tile.getLevel();
         if( world != null && !world.isClientSide ) toTick.add( tile );
     }
 
@@ -49,18 +50,18 @@ public final class TickScheduler
     {
         if( event.phase != TickEvent.Phase.START ) return;
 
-        Iterator<TileEntity> iterator = toTick.iterator();
+        Iterator<BlockEntity> iterator = toTick.iterator();
         while( iterator.hasNext() )
         {
-            TileEntity tile = iterator.next();
+            BlockEntity tile = iterator.next();
             iterator.remove();
 
-            World world = tile.getLevel();
+            Level world = tile.getLevel();
             BlockPos pos = tile.getBlockPos();
 
-            if( world != null && pos != null && world.isAreaLoaded( pos, 0 ) && world.getBlockEntity( pos ) == tile )
+            if( world != null && pos != null && world.isLoaded( pos ) && world.getBlockEntity( pos ) == tile )
             {
-                world.getBlockTicks().scheduleTick( pos, tile.getBlockState().getBlock(), 0 );
+                world.scheduleTick( pos, tile.getBlockState().getBlock(), 0 );
             }
         }
     }

@@ -12,11 +12,11 @@ import dan200.computercraft.shared.PocketUpgrades;
 import dan200.computercraft.shared.pocket.core.PocketServerComputer;
 import dan200.computercraft.shared.util.InventoryUtil;
 import dan200.computercraft.shared.util.WorldUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 
 /**
@@ -25,13 +25,13 @@ import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
  * This API is only available on pocket computers. As such, you may use its presence to determine what kind of computer
  * you are using:
  *
- * <pre>
+ * <pre>{@code
  * if pocket then
  *   print("On a pocket computer")
  * else
  *   print("On something else")
  * end
- * </pre>
+ * }</pre>
  *
  * @cc.module pocket
  */
@@ -63,9 +63,8 @@ public class PocketAPI implements ILuaAPI
     public final Object[] equipBack()
     {
         Entity entity = computer.getEntity();
-        if( !(entity instanceof PlayerEntity) ) return new Object[] { false, "Cannot find player" };
-        PlayerEntity player = (PlayerEntity) entity;
-        PlayerInventory inventory = player.inventory;
+        if( !(entity instanceof Player player) ) return new Object[] { false, "Cannot find player" };
+        Inventory inventory = player.getInventory();
         IPocketUpgrade previousUpgrade = computer.getUpgrade();
 
         // Attempt to find the upgrade, starting in the main segment, and then looking in the opposite
@@ -108,9 +107,8 @@ public class PocketAPI implements ILuaAPI
     public final Object[] unequipBack()
     {
         Entity entity = computer.getEntity();
-        if( !(entity instanceof PlayerEntity) ) return new Object[] { false, "Cannot find player" };
-        PlayerEntity player = (PlayerEntity) entity;
-        PlayerInventory inventory = player.inventory;
+        if( !(entity instanceof Player player) ) return new Object[] { false, "Cannot find player" };
+        Inventory inventory = player.getInventory();
         IPocketUpgrade previousUpgrade = computer.getUpgrade();
 
         if( previousUpgrade == null ) return new Object[] { false, "Nothing to unequip" };
@@ -137,7 +135,7 @@ public class PocketAPI implements ILuaAPI
             ItemStack invStack = inv.get( (i + start) % inv.size() );
             if( !invStack.isEmpty() )
             {
-                IPocketUpgrade newUpgrade = PocketUpgrades.get( invStack );
+                IPocketUpgrade newUpgrade = PocketUpgrades.instance().get( invStack );
 
                 if( newUpgrade != null && newUpgrade != previous )
                 {

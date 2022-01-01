@@ -15,29 +15,30 @@ import dan200.computercraft.api.network.IPacketNetwork;
 import dan200.computercraft.api.network.wired.IWiredElement;
 import dan200.computercraft.api.network.wired.IWiredNode;
 import dan200.computercraft.api.peripheral.IPeripheralProvider;
-import dan200.computercraft.api.pocket.IPocketUpgrade;
 import dan200.computercraft.api.redstone.IBundledRedstoneProvider;
-import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import dan200.computercraft.core.apis.ApiFactories;
 import dan200.computercraft.core.asm.GenericMethod;
 import dan200.computercraft.core.filesystem.FileMount;
 import dan200.computercraft.core.filesystem.ResourceMount;
-import dan200.computercraft.shared.*;
+import dan200.computercraft.shared.BundledRedstone;
+import dan200.computercraft.shared.MediaProviders;
+import dan200.computercraft.shared.Peripherals;
 import dan200.computercraft.shared.peripheral.generic.GenericPeripheralProvider;
 import dan200.computercraft.shared.peripheral.modem.wireless.WirelessNetwork;
 import dan200.computercraft.shared.util.IDAssigner;
 import dan200.computercraft.shared.wired.WiredNode;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -58,7 +59,7 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
 
     public static InputStream getResourceFile( String domain, String subPath )
     {
-        IReloadableResourceManager manager = (IReloadableResourceManager) ServerLifecycleHooks.getCurrentServer().getDataPackRegistries().getResourceManager();
+        ReloadableResourceManager manager = (ReloadableResourceManager) ServerLifecycleHooks.getCurrentServer().getResourceManager();
         try
         {
             return manager.getResource( new ResourceLocation( domain, subPath ) ).getInputStream();
@@ -80,13 +81,13 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
     }
 
     @Override
-    public int createUniqueNumberedSaveDir( @Nonnull World world, @Nonnull String parentSubPath )
+    public int createUniqueNumberedSaveDir( @Nonnull Level world, @Nonnull String parentSubPath )
     {
         return IDAssigner.getNextId( parentSubPath );
     }
 
     @Override
-    public IWritableMount createSaveDirMount( @Nonnull World world, @Nonnull String subPath, long capacity )
+    public IWritableMount createSaveDirMount( @Nonnull Level world, @Nonnull String subPath, long capacity )
     {
         try
         {
@@ -101,7 +102,7 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
     @Override
     public IMount createResourceMount( @Nonnull String domain, @Nonnull String subPath )
     {
-        IReloadableResourceManager manager = (IReloadableResourceManager) ServerLifecycleHooks.getCurrentServer().getDataPackRegistries().getResourceManager();
+        ResourceManager manager = ServerLifecycleHooks.getCurrentServer().getResourceManager();
         ResourceMount mount = ResourceMount.get( domain, subPath, manager );
         return mount.exists( "" ) ? mount : null;
     }
@@ -125,19 +126,13 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
     }
 
     @Override
-    public void registerTurtleUpgrade( @Nonnull ITurtleUpgrade upgrade )
-    {
-        TurtleUpgrades.register( upgrade );
-    }
-
-    @Override
     public void registerBundledRedstoneProvider( @Nonnull IBundledRedstoneProvider provider )
     {
         BundledRedstone.register( provider );
     }
 
     @Override
-    public int getBundledRedstoneOutput( @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Direction side )
+    public int getBundledRedstoneOutput( @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Direction side )
     {
         return BundledRedstone.getDefaultOutput( world, pos, side );
     }
@@ -146,12 +141,6 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
     public void registerMediaProvider( @Nonnull IMediaProvider provider )
     {
         MediaProviders.register( provider );
-    }
-
-    @Override
-    public void registerPocketUpgrade( @Nonnull IPocketUpgrade upgrade )
-    {
-        PocketUpgrades.register( upgrade );
     }
 
     @Nonnull
@@ -176,9 +165,9 @@ public final class ComputerCraftAPIImpl implements IComputerCraftAPI
 
     @Nonnull
     @Override
-    public LazyOptional<IWiredElement> getWiredElementAt( @Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull Direction side )
+    public LazyOptional<IWiredElement> getWiredElementAt( @Nonnull BlockGetter world, @Nonnull BlockPos pos, @Nonnull Direction side )
     {
-        TileEntity tile = world.getBlockEntity( pos );
+        BlockEntity tile = world.getBlockEntity( pos );
         return tile == null ? LazyOptional.empty() : tile.getCapability( CAPABILITY_WIRED_ELEMENT, side );
     }
 }

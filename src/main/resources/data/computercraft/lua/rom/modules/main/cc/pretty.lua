@@ -15,11 +15,14 @@ The structure of this module is based on [A Prettier Printer][prettier].
 [prettier]: https://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf "A Prettier Printer"
 
 @module cc.pretty
+@since 1.87.0
 @usage Print a table to the terminal
+
     local pretty = require "cc.pretty"
-    pretty.print(pretty.pretty({ 1, 2, 3 }))
+    pretty.pretty_print({ 1, 2, 3 })
 
 @usage Build a custom document and display it
+
     local pretty = require "cc.pretty"
     pretty.print(pretty.group(pretty.text("hello") .. pretty.space_line .. pretty.text("world")))
 ]]
@@ -74,6 +77,7 @@ end
 -- colour.
 -- @treturn Doc The document with the provided text.
 -- @usage Write some blue text.
+--
 --     local pretty = require "cc.pretty"
 --     pretty.print(pretty.text("Hello!", colours.blue))
 local function text(text, colour)
@@ -220,8 +224,8 @@ end
 
 --- Display a document on the terminal.
 --
--- @tparam      Doc     doc         The document to render
--- @tparam[opt] number  ribbon_frac The maximum fraction of the width that we should write in.
+-- @tparam          Doc     doc         The document to render
+-- @tparam[opt=0.6] number  ribbon_frac The maximum fraction of the width that we should write in.
 local function write(doc, ribbon_frac)
     if getmetatable(doc) ~= Doc then expect(1, doc, "document") end
     expect(2, ribbon_frac, "number", "nil")
@@ -282,8 +286,8 @@ end
 
 --- Display a document on the terminal with a trailing new line.
 --
--- @tparam      Doc     doc         The document to render.
--- @tparam[opt] number  ribbon_frac The maximum fraction of the width that we should write in.
+-- @tparam          Doc     doc         The document to render.
+-- @tparam[opt=0.6] number  ribbon_frac The maximum fraction of the width that we should write in.
 local function print(doc, ribbon_frac)
     if getmetatable(doc) ~= Doc then expect(1, doc, "document") end
     expect(2, ribbon_frac, "number", "nil")
@@ -293,10 +297,10 @@ end
 
 --- Render a document, converting it into a string.
 --
--- @tparam      Doc     doc         The document to render.
--- @tparam[opt] number  width       The maximum width of this document. Note that long strings will not be wrapped to
--- fit this width - it is only used for finding the best layout.
--- @tparam[opt] number  ribbon_frac The maximum fraction of the width that we should write in.
+-- @tparam          Doc     doc         The document to render.
+-- @tparam[opt]     number width The maximum width of this document. Note that long strings will not be wrapped to fit
+-- this width - it is only used for finding the best layout.
+-- @tparam[opt=0.6] number  ribbon_frac The maximum fraction of the width that we should write in.
 -- @treturn string The rendered document as a string.
 local function render(doc, width, ribbon_frac)
     if getmetatable(doc) ~= Doc then expect(1, doc, "document") end
@@ -454,9 +458,12 @@ end
 --  - `function_source`: Show where the function was defined, instead of
 --    `function: xxxxxxxx` (`false` by default).
 -- @treturn Doc The object formatted as a document.
+-- @changed 1.88.0 Added `options` argument.
 -- @usage Display a table on the screen
+--
 --     local pretty = require "cc.pretty"
 --     pretty.print(pretty.pretty({ 1, 2, 3 }))
+-- @see pretty_print for a shorthand to prettify and print an object.
 local function pretty(obj, options)
     expect(2, options, "table", "nil")
     options = options or {}
@@ -466,6 +473,33 @@ local function pretty(obj, options)
         function_args = field(options, "function_args", "boolean", "nil") or false,
     }
     return pretty_impl(obj, actual_options, {})
+end
+
+--[[- A shortcut for calling @{pretty} and @{print} together.
+
+@param obj The object to pretty-print.
+@tparam[opt] { function_args = boolean, function_source = boolean } options
+Controls how various properties are displayed.
+ - `function_args`: Show the arguments to a function if known (`false` by default).
+ - `function_source`: Show where the function was defined, instead of
+   `function: xxxxxxxx` (`false` by default).
+@tparam[opt=0.6] number ribbon_frac The maximum fraction of the width that we should write in.
+
+@usage Display a table on the screen.
+
+    local pretty = require "cc.pretty"
+    pretty.pretty_print({ 1, 2, 3 })
+
+@see pretty
+@see print
+@since 1.99
+]]
+local function pretty_print(obj, options, ribbon_frac)
+    expect(2, options, "table", "nil")
+    options = options or {}
+    expect(3, ribbon_frac, "number", "nil")
+
+    return print(pretty(obj, options), ribbon_frac)
 end
 
 return {
@@ -483,4 +517,6 @@ return {
     render = render,
 
     pretty = pretty,
+
+    pretty_print = pretty_print,
 }

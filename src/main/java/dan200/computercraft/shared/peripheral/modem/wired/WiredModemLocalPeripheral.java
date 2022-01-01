@@ -9,13 +9,12 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.Peripherals;
 import dan200.computercraft.shared.Registry;
 import dan200.computercraft.shared.util.IDAssigner;
-import net.minecraft.block.Block;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.util.NonNullConsumer;
 
 import javax.annotation.Nonnull;
@@ -34,11 +33,11 @@ public final class WiredModemLocalPeripheral
     private static final String NBT_PERIPHERAL_TYPE = "PeripheralType";
     private static final String NBT_PERIPHERAL_ID = "PeripheralId";
 
-    private int id;
+    private int id = -1;
     private String type;
 
     private IPeripheral peripheral;
-    private final NonNullConsumer<LazyOptional<IPeripheral>> invalidate;
+    private final NonNullConsumer<Object> invalidate;
 
     public WiredModemLocalPeripheral( @Nonnull Runnable invalidate )
     {
@@ -53,7 +52,7 @@ public final class WiredModemLocalPeripheral
      * @param direction The direction so search in
      * @return Whether the peripheral changed.
      */
-    public boolean attach( @Nonnull World world, @Nonnull BlockPos origin, @Nonnull Direction direction )
+    public boolean attach( @Nonnull Level world, @Nonnull BlockPos origin, @Nonnull Direction direction )
     {
         IPeripheral oldPeripheral = peripheral;
         IPeripheral peripheral = this.peripheral = getPeripheralFrom( world, origin, direction );
@@ -123,23 +122,23 @@ public final class WiredModemLocalPeripheral
             : Collections.singletonMap( type + "_" + id, peripheral );
     }
 
-    public void write( @Nonnull CompoundNBT tag, @Nonnull String suffix )
+    public void write( @Nonnull CompoundTag tag, @Nonnull String suffix )
     {
         if( id >= 0 ) tag.putInt( NBT_PERIPHERAL_ID + suffix, id );
         if( type != null ) tag.putString( NBT_PERIPHERAL_TYPE + suffix, type );
     }
 
-    public void read( @Nonnull CompoundNBT tag, @Nonnull String suffix )
+    public void read( @Nonnull CompoundTag tag, @Nonnull String suffix )
     {
-        id = tag.contains( NBT_PERIPHERAL_ID + suffix, Constants.NBT.TAG_ANY_NUMERIC )
+        id = tag.contains( NBT_PERIPHERAL_ID + suffix, Tag.TAG_ANY_NUMERIC )
             ? tag.getInt( NBT_PERIPHERAL_ID + suffix ) : -1;
 
-        type = tag.contains( NBT_PERIPHERAL_TYPE + suffix, Constants.NBT.TAG_STRING )
+        type = tag.contains( NBT_PERIPHERAL_TYPE + suffix, Tag.TAG_STRING )
             ? tag.getString( NBT_PERIPHERAL_TYPE + suffix ) : null;
     }
 
     @Nullable
-    private IPeripheral getPeripheralFrom( World world, BlockPos pos, Direction direction )
+    private IPeripheral getPeripheralFrom( Level world, BlockPos pos, Direction direction )
     {
         BlockPos offset = pos.relative( direction );
 

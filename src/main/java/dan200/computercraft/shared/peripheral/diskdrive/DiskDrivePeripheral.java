@@ -13,7 +13,7 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.MediaProviders;
 import dan200.computercraft.shared.media.items.ItemDisk;
 import dan200.computercraft.shared.util.StringUtil;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -186,6 +186,7 @@ public class DiskDrivePeripheral implements IPeripheral
      *
      * @return The ID of the disk in the drive, or {@code nil} if no disk with an ID is inserted.
      * @cc.treturn number The The ID of the disk in the drive, or {@code nil} if no disk with an ID is inserted.
+     * @cc.since 1.4
      */
     @LuaFunction
     public final Object[] getDiskID()
@@ -209,7 +210,7 @@ public class DiskDrivePeripheral implements IPeripheral
     @Override
     public boolean equals( IPeripheral other )
     {
-        return this == other || other instanceof DiskDrivePeripheral && ((DiskDrivePeripheral) other).diskDrive == diskDrive;
+        return this == other || other instanceof DiskDrivePeripheral drive && drive.diskDrive == diskDrive;
     }
 
     @Nonnull

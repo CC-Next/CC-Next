@@ -1,8 +1,9 @@
 ; -*- mode: Lisp;-*-
 
 (sources
-  /doc/stub/
   /doc/events/
+  /doc/guides/
+  /doc/stub/
   /build/docs/luaJavadoc/
   /src/main/resources/*/computercraft/lua/bios.lua
   /src/main/resources/*/computercraft/lua/rom/
@@ -18,7 +19,7 @@
     (title "CC: Tweaked")
     (logo src/main/resources/pack.png)
     (url https://tweaked.cc/)
-    (source-link https://github.com/SquidDev-CC/CC-Tweaked/blob/${commit}/${path}#L${line})
+    (source-link https://github.com/cc-tweaked/CC-Tweaked/blob/${commit}/${path}#L${line})
 
     (styles src/web/styles.css)
     (scripts build/rollup/index.js)
@@ -27,7 +28,8 @@
   (module-kinds
     (peripheral Peripherals)
     (generic_peripheral "Generic Peripherals")
-    (event Events))
+    (event Events)
+    (guide Guides))
 
   (library-path
     /doc/stub/
@@ -61,6 +63,8 @@
       (table space)
       (index no-space))
 
+    (allow-clarifying-parens true)
+
     ;; colours imports from colors, and we don't handle that right now.
     ;; keys is entirely dynamic, so we skip it.
     (dynamic-modules colours keys _G)
@@ -69,6 +73,7 @@
       :max
       _CC_DEFAULT_SETTINGS
       _CC_DISABLE_LUA51_FEATURES
+      _HOST
       ;; Ideally we'd pick these up from bios.lua, but illuaminate currently
       ;; isn't smart enough.
       sleep write printError read rs)))

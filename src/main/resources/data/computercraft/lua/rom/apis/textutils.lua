@@ -2,6 +2,7 @@
 -- manipulating strings.
 --
 -- @module textutils
+-- @since 1.2
 
 local expect = dofile("rom/modules/main/cc/expect.lua")
 local expect, field = expect.expect, expect.field
@@ -17,6 +18,7 @@ local wrap = dofile("rom/modules/main/cc/strings.lua").wrap
 -- Defaults to 20.
 -- @usage textutils.slowWrite("Hello, world!")
 -- @usage textutils.slowWrite("Hello, world!", 5)
+-- @since 1.3
 function slowWrite(text, rate)
     expect(2, rate, "number", "nil")
     rate = rate or 20
@@ -55,7 +57,12 @@ end
 -- @tparam[opt] boolean bTwentyFourHour Whether to format this as a 24-hour
 -- clock (`18:30`) rather than a 12-hour one (`6:30 AM`)
 -- @treturn string The formatted time
--- @usage textutils.formatTime(os.time())
+-- @usage Print the current in-game time as a 12-hour clock.
+--
+--     textutils.formatTime(os.time())
+-- @usage Print the local time as a 24-hour clock.
+--
+--     textutils.formatTime(os.time("local"), true)
 function formatTime(nTime, bTwentyFourHour)
     expect(1, nTime, "number")
     expect(2, bTwentyFourHour, "boolean", "nil")
@@ -101,39 +108,48 @@ local function makePagedScroll(_term, _nFreeLines)
     end
 end
 
---- Prints a given string to the display.
---
--- If the action can be completed without scrolling, it acts much the same as
--- @{print}; otherwise, it will throw up a "Press any key to continue" prompt at
--- the bottom of the display. Each press will cause it to scroll down and write
--- a single line more before prompting again, if need be.
---
--- @tparam string _sText The text to print to the screen.
--- @tparam[opt] number _nFreeLines The number of lines which will be
--- automatically scrolled before the first prompt appears (meaning _nFreeLines +
--- 1 lines will be printed). This can be set to the terminal's height - 2 to
--- always try to fill the screen. Defaults to 0, meaning only one line is
--- displayed before prompting.
--- @treturn number The number of lines printed.
--- @usage
---     local width, height = term.getSize()
---     textutils.pagedPrint(("This is a rather verbose dose of repetition.\n"):rep(30), height - 2)
-function pagedPrint(_sText, _nFreeLines)
-    expect(2, _nFreeLines, "number", "nil")
+--[[- Prints a given string to the display.
+
+If the action can be completed without scrolling, it acts much the same as
+@{print}; otherwise, it will throw up a "Press any key to continue" prompt at
+the bottom of the display. Each press will cause it to scroll down and write a
+single line more before prompting again, if need be.
+
+@tparam string text The text to print to the screen.
+@tparam[opt] number free_lines The number of lines which will be
+automatically scrolled before the first prompt appears (meaning free_lines +
+1 lines will be printed). This can be set to the cursor's y position - 2 to
+always try to fill the screen. Defaults to 0, meaning only one line is
+displayed before prompting.
+@treturn number The number of lines printed.
+
+@usage Generates several lines of text and then prints it, paging once the
+bottom of the terminal is reached.
+
+    local lines = {}
+    for i = 1, 30 do lines[i] = ("This is line #%d"):format(i) end
+    local message = table.concat(lines, "\n")
+
+    local width, height = term.getCursorPos()
+    textutils.pagedPrint(message, height - 2)
+]]
+function pagedPrint(text, free_lines)
+    expect(2, free_lines, "number", "nil")
     -- Setup a redirector
     local oldTerm = term.current()
     local newTerm = {}
     for k, v in pairs(oldTerm) do
         newTerm[k] = v
     end
-    newTerm.scroll = makePagedScroll(oldTerm, _nFreeLines)
+
+    newTerm.scroll = makePagedScroll(oldTerm, free_lines)
     term.redirect(newTerm)
 
     -- Print the text
     local result
     local ok, err = pcall(function()
-        if _sText ~= nil then
-            result = print(_sText)
+        if text ~= nil then
+            result = print(text)
         else
             result = print()
         end
@@ -207,30 +223,45 @@ local function tabulateCommon(bPaged, ...)
     end
 end
 
---- Prints tables in a structured form.
---
--- This accepts multiple arguments, either a table or a number. When
--- encountering a table, this will be treated as a table row, with each column
--- width being auto-adjusted.
---
--- When encountering a number, this sets the text color of the subsequent rows to it.
---
--- @tparam {string...}|number ... The rows and text colors to display.
--- @usage textutils.tabulate(colors.orange, { "1", "2", "3" }, colors.lightBlue, { "A", "B", "C" })
+--[[- Prints tables in a structured form.
+
+This accepts multiple arguments, either a table or a number. When
+encountering a table, this will be treated as a table row, with each column
+width being auto-adjusted.
+
+When encountering a number, this sets the text color of the subsequent rows to it.
+
+@tparam {string...}|number ... The rows and text colors to display.
+@since 1.3
+@usage
+
+    textutils.tabulate(
+      colors.orange, { "1", "2", "3" },
+      colors.lightBlue, { "A", "B", "C" }
+    )
+]]
 function tabulate(...)
     return tabulateCommon(false, ...)
 end
 
---- Prints tables in a structured form, stopping and prompting for input should
--- the result not fit on the terminal.
---
--- This functions identically to @{textutils.tabulate}, but will prompt for user
--- input should the whole output not fit on the display.
---
--- @tparam {string...}|number ... The rows and text colors to display.
--- @usage textutils.tabulate(colors.orange, { "1", "2", "3" }, colors.lightBlue, { "A", "B", "C" })
--- @see textutils.tabulate
--- @see textutils.pagedPrint
+--[[- Prints tables in a structured form, stopping and prompting for input should
+the result not fit on the terminal.
+
+This functions identically to @{textutils.tabulate}, but will prompt for user
+input should the whole output not fit on the display.
+
+@tparam {string...}|number ... The rows and text colors to display.
+@see textutils.tabulate
+@see textutils.pagedPrint
+@since 1.3
+
+@usage Generates a long table, tabulates it, and prints it to the screen.
+
+    local rows = {}
+    for i = 1, 30 do rows[i] = {("Row #%d"):format(i), math.random(1, 400)} end
+
+    textutils.tabulate(colors.orange, {"Column", "Value"}, colors.lightBlue, table.unpack(rows))
+]]
 function pagedTabulate(...)
     return tabulateCommon(true, ...)
 end
@@ -259,11 +290,16 @@ local g_tLuaKeywords = {
     ["while"] = true,
 }
 
+local serialize_infinity = math.huge
 local function serialize_impl(t, tracking, indent, opts)
     local sType = type(t)
     if sType == "table" then
         if tracking[t] ~= nil then
-            error("Cannot serialize table with recursive entries", 0)
+            if tracking[t] == false then
+                error("Cannot serialize table with repeated entries", 0)
+            else
+                error("Cannot serialize table with recursive entries", 0)
+            end
         end
         tracking[t] = true
 
@@ -298,13 +334,28 @@ local function serialize_impl(t, tracking, indent, opts)
             result = result .. indent .. "}"
         end
 
-        if opts.allow_repetitions then tracking[t] = nil end
+        if opts.allow_repetitions then
+            tracking[t] = nil
+        else
+            tracking[t] = false
+        end
         return result
 
     elseif sType == "string" then
         return string.format("%q", t)
 
-    elseif sType == "number" or sType == "boolean" or sType == "nil" then
+    elseif sType == "number" then
+        if t ~= t then --nan
+            return "0/0"
+        elseif t == serialize_infinity then
+            return "1/0"
+        elseif t == -serialize_infinity then
+            return "-1/0"
+        else
+            return tostring(t)
+        end
+
+    elseif sType == "boolean" or sType == "nil" then
         return tostring(t)
 
     else
@@ -620,6 +671,7 @@ do
     -- @return[1] The deserialised object
     -- @treturn[2] nil If the object could not be deserialised.
     -- @treturn string A message describing why the JSON string is invalid.
+    -- @since 1.87.0
     unserialise_json = function(s, options)
         expect(1, s, "string")
         expect(2, options, "table", "nil")
@@ -662,9 +714,11 @@ saving in a file or pretty-printing.
 @throws If the object contains a value which cannot be
 serialised. This includes functions and tables which appear multiple
 times.
-@see cc.pretty.pretty An alternative way to display a table, often more suitable for
-pretty printing.
-@usage Pretty print a basic table.
+@see cc.pretty.pretty_print An alternative way to display a table, often more
+suitable for pretty printing.
+@since 1.3
+@changed 1.97.0 Added `opts` argument.
+@usage Serialise a basic table.
 
     textutils.serialise({ 1, 2, 3, a = 1, ["another key"] = { true } })
 
@@ -697,6 +751,7 @@ serialise = serialize -- GB version
 -- @tparam string s The serialised string to deserialise.
 -- @return[1] The deserialised object
 -- @treturn[2] nil If the object could not be deserialised.
+-- @since 1.3
 function unserialize(s)
     expect(1, s, "string")
     local func = load("return " .. s, "unserialize", "t", {})
@@ -729,6 +784,7 @@ unserialise = unserialize -- GB version
 -- serialised. This includes functions and tables which appear multiple
 -- times.
 -- @usage textutils.serializeJSON({ values = { 1, "2", true } })
+-- @since 1.7
 function serializeJSON(t, bNBTStyle)
     expect(1, t, "table", "string", "number", "boolean")
     expect(2, bNBTStyle, "boolean", "nil")
@@ -746,6 +802,7 @@ unserialiseJSON = unserialise_json
 -- @tparam string str The string to encode
 -- @treturn string The encoded string.
 -- @usage print("https://example.com/?view=" .. textutils.urlEncode("some text&things"))
+-- @since 1.31
 function urlEncode(str)
     expect(1, str, "string")
     if str then
@@ -785,6 +842,7 @@ local tEmpty = {}
 -- @see shell.setCompletionFunction
 -- @see _G.read
 -- @usage textutils.complete( "pa", _ENV )
+-- @since 1.74
 function complete(sSearchText, tSearchTable)
     expect(1, sSearchText, "string")
     expect(2, tSearchTable, "table", "nil")

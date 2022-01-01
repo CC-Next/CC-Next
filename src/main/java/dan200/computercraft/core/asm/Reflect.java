@@ -6,6 +6,7 @@
 package dan200.computercraft.core.asm;
 
 import dan200.computercraft.ComputerCraft;
+import dan200.computercraft.api.lua.LuaTable;
 import org.objectweb.asm.MethodVisitor;
 
 import javax.annotation.Nullable;
@@ -25,7 +26,7 @@ final class Reflect
     }
 
     @Nullable
-    static String getLuaName( Class<?> klass )
+    static String getLuaName( Class<?> klass, boolean unsafe )
     {
         if( klass.isPrimitive() )
         {
@@ -39,6 +40,7 @@ final class Reflect
             if( klass == Map.class ) return "Table";
             if( klass == String.class ) return "String";
             if( klass == ByteBuffer.class ) return "Bytes";
+            if( klass == LuaTable.class && unsafe ) return "TableUnsafe";
         }
 
         return null;
@@ -52,9 +54,8 @@ final class Reflect
         {
             if( underlying instanceof Class<?> ) return (Class<?>) underlying;
 
-            if( underlying instanceof ParameterizedType )
+            if( underlying instanceof ParameterizedType type )
             {
-                ParameterizedType type = (ParameterizedType) underlying;
                 if( !allowParameter )
                 {
                     for( java.lang.reflect.Type arg : type.getActualTypeArguments() )

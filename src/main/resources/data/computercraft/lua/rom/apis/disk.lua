@@ -1,15 +1,18 @@
---- The Disk API allows you to interact with disk drives.
---
--- These functions can operate on locally attached or remote disk drives. To use
--- a locally attached drive, specify “side” as one of the six sides
--- (e.g. `left`); to use a remote disk drive, specify its name as printed when
--- enabling its modem (e.g. `drive_0`).
---
--- **Note:** All computers (except command computers), turtles and pocket
--- computers can be placed within a disk drive to access it's internal storage
--- like a disk.
---
--- @module disk
+--[[- The Disk API allows you to interact with disk drives.
+
+These functions can operate on locally attached or remote disk drives. To use a
+locally attached drive, specify “side” as one of the six sides (e.g. `left`); to
+use a remote disk drive, specify its name as printed when enabling its modem
+(e.g. `drive_0`).
+
+:::tip
+All computers (except command computers), turtles and pocket computers can be
+placed within a disk drive to access it's internal storage like a disk.
+:::
+
+@module disk
+@since 1.2
+]]
 
 local function isDrive(name)
     if type(name) ~= "string" then
@@ -163,6 +166,7 @@ end
 --
 -- @tparam string name The name of the disk drive.
 -- @treturn string|nil The disk ID, or `nil` if the drive does not contain a floppy disk.
+-- @since 1.4
 function getID(name)
     if isDrive(name) then
         return peripheral.call(name, "getDiskID")

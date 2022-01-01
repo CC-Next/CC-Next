@@ -162,7 +162,7 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.18.1:9.1.0.47:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.18.1:9.1.0.47")
 
-    shade 'org.squiddev:Cobalt:0.5.2-SNAPSHOT'
+    shade files('./Cobalt-0.5.4+859205c+484ae62+.PR50.jar')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.0'

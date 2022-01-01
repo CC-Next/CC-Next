@@ -43,6 +43,7 @@ public final class Config
     private static final ConfigValue<String> defaultComputerSettings;
     private static final ConfigValue<Boolean> logComputerErrors;
     private static final ConfigValue<Boolean> commandRequireCreative;
+    private static final ConfigValue<Boolean> disableGotoStatement;
 
     private static final ConfigValue<Integer> computerThreads;
     private static final ConfigValue<Integer> maxMainGlobalTime;
@@ -129,6 +130,11 @@ public final class Config
                 .comment( "Require players to be in creative mode and be opped in order to interact with command computers." +
                     "This is the default behaviour for vanilla's Command blocks." )
                 .define( "command_require_creative", ComputerCraft.commandRequireCreative );
+
+            disableGotoStatement = builder
+                .comment( "Set this to true to disable Lua 5.2's goto statement. " +
+                    "This will always treat the word 'goto' as a name for compatibility." )
+                .define( "disable_goto_statement", ComputerCraft.disableGotoStatement );
         }
 
         {
@@ -326,6 +332,7 @@ public final class Config
         ComputerCraft.computerThreads = computerThreads.get();
         ComputerCraft.logComputerErrors = logComputerErrors.get();
         ComputerCraft.commandRequireCreative = commandRequireCreative.get();
+        ComputerCraft.disableGotoStatement = disableGotoStatement.get();
 
         // Execution
         ComputerCraft.computerThreads = computerThreads.get();

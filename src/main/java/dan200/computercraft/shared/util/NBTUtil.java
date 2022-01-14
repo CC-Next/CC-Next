@@ -8,8 +8,6 @@ package dan200.computercraft.shared.util;
 import com.google.common.io.BaseEncoding;
 import dan200.computercraft.ComputerCraft;
 import net.minecraft.nbt.*;
-//import org.apache.commons.codec.binary.Hex;
-//import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

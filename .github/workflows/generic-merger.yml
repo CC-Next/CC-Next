@@ -25,22 +25,10 @@ jobs:
 
 
     - name: merge and force push
-      #uses: bambamboole/gha-upmerge@v1.0.1
-      #with:
-      #  from_branch: ${{ inputs.from-branch }}
-      #  to_branch: ${{ inputs.to-branch }}
-      
-      uses: robotology/gh-action-nightly-merge@v1.3.2
+      uses: bambamboole/gha-upmerge@v1.0.1
       with:
-        stable_branch: ${{ inputs.to-branch }}
-        development_branch: ${{ inputs.from-branch }}
-        allow_ff: true
-        allow_git_lfs: true
-        ff_only: false
-        allow_forks: false
-        #user_name: # optional, default is GitHub Nightly Merge Action
-        #user_email: # optional, default is actions@github.com
-        #push_token: # optional, default is GITHUB_TOKEN
+        from_branch: ${{ inputs.from-branch }}
+        to_branch: ${{ inputs.to-branch }}
 
     - name: remove gh token from env
       run: echo "GITHUB_TOKEN=purged" >> $GITHUB_ENV

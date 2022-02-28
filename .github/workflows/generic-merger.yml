@@ -24,19 +24,11 @@ jobs:
       run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
 
-    #- name: merge and force push
-    #  uses: bambamboole/gha-upmerge@v1.0.1
-    #  with:
-    #    from_branch: ${{ inputs.from-branch }}
-    #    to_branch: ${{ inputs.to-branch }}
-        
-    - name: merge
-      uses: buildsville/simple-merge@v1
+    - name: merge and force push
+      uses: bambamboole/gha-upmerge@v1.0.1
       with:
-        method: "ort" # local uses ort it seems
-        
-    - name: push
-      uses: ludeeus/action-push@0.0.1
+        from_branch: ${{ inputs.from-branch }}
+        to_branch: ${{ inputs.to-branch }}
 
     - name: remove gh token from env
       run: echo "GITHUB_TOKEN=purged" >> $GITHUB_ENV

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[39,40)"
+loaderVersion="[40,41)"
 
 issueTrackerURL="https://github.com/CC-Next/CC-Next/issues"
 logoFile="pack.png"
@@ -21,6 +21,6 @@ Bleeding edge CC:T builds. Expect bugs.
 [[dependencies.computercraft]]
     modId="forge"
     mandatory=true
-    versionRange="[39.0.0,40)"
+    versionRange="[40.0.2,41)"
     ordering="NONE"
     side="BOTH"

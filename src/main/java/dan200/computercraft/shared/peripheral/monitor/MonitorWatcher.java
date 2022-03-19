@@ -9,14 +9,13 @@ import dan200.computercraft.ComputerCraft;
 import dan200.computercraft.shared.network.NetworkHandler;
 import dan200.computercraft.shared.network.client.MonitorClientMessage;
 import dan200.computercraft.shared.network.client.TerminalState;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,8 +46,10 @@ public final class MonitorWatcher
     @SubscribeEvent
     public static void onWatch( ChunkWatchEvent.Watch event )
     {
+        // Get the current chunk if it has been loaded. This is safe as, if the chunk hasn't been loaded yet, then the
+        // monitor will have no contents, and so we won't need to send an update anyway.
         ChunkPos chunkPos = event.getPos();
-        LevelChunk chunk = (LevelChunk) event.getWorld().getChunk( chunkPos.x, chunkPos.z, ChunkStatus.FULL, false );
+        Chunk chunk = event.getWorld().getChunkSource().getChunkNow( chunkPos.x, chunkPos.z );
         if( chunk == null ) return;
 
         for( BlockEntity te : chunk.getBlockEntities().values() )

@@ -21,6 +21,6 @@ Bleeding edge CC:T builds. Expect bugs.
 [[dependencies.computercraft]]
     modId="forge"
     mandatory=true
-    versionRange="[40.0.2,41)"
+    versionRange="[40.0.24,41)"
     ordering="NONE"
     side="BOTH"

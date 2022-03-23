@@ -20,7 +20,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.gen.chunk;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

@@ -43,19 +43,19 @@ jobs:
           echo "upstream-branch=${{ inputs.upstream-branch }}" >> $GITHUB_ENV;
         fi
 
-    - name: pull upstream
-      run: |
-        git checkout ${{ inputs.branch }}
-        git pull upstream ${{ env.upstream-branch }}
-
-    - name: output upstream commit id
-      id: output-upstream-commit-id
-      run: echo "::set-output name=upstreamCommit::`git rev-parse upstream/${{ env.upstream-branch }}`"
-
-
-    - name: push changes
-      uses: dciborow/commit@0.0.1
-      if: ${{ env.ACT || success() }}
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        push-branch: '${{ inputs.branch }}'
+#    - name: pull upstream
+#      run: |
+#        git checkout ${{ inputs.branch }}
+#        git pull upstream ${{ env.upstream-branch }}
+#
+#    - name: output upstream commit id
+#      id: output-upstream-commit-id
+#      run: echo "::set-output name=upstreamCommit::`git rev-parse upstream/${{ env.upstream-branch }}`"
+#
+#
+#    - name: push changes
+#      uses: dciborow/commit@0.0.1
+#      if: ${{ env.ACT || success() }}
+#      with:
+#        github-token: ${{ secrets.GITHUB_TOKEN }}
+#        push-branch: '${{ inputs.branch }}'

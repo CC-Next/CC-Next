@@ -24,11 +24,11 @@ jobs:
       run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
 
-    - name: merge and force push
-      uses: bambamboole/gha-upmerge@v1.0.1
-      with:
-        from_branch: ${{ inputs.from-branch }}
-        to_branch: ${{ inputs.to-branch }}
+#    - name: merge and force push
+#      uses: bambamboole/gha-upmerge@v1.0.1
+#      with:
+#        from_branch: ${{ inputs.from-branch }}
+#        to_branch: ${{ inputs.to-branch }}
 
     - name: remove gh token from env
       run: echo "GITHUB_TOKEN=purged" >> $GITHUB_ENV
